@@ -55,6 +55,9 @@ const DesktopAppBar = () => {
         <Link href="/carts" passHref>
           <Button color="inherit">카트</Button>
         </Link>
+        <Link href="/cartItems" passHref>
+          <Button color="inherit">장바구니</Button>
+        </Link>
         <Link href="/products" passHref>
           <Button color="inherit">상품목록</Button>
         </Link>
