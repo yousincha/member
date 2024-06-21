@@ -29,6 +29,7 @@ const useStyles = {
     justifyContent: "center",
   },
 };
+
 const ProductList = ({
   categories,
   products,
@@ -36,13 +37,13 @@ const ProductList = ({
   totalPages,
   categoryId,
 }) => {
-  const [cartItems, setCartItems] = useState([]); // 장바구니 정보를 상태로 관리
-  const [memberId, setMemberId] = useState(""); // memberId 상태 관리
+  const [cartItems, setCartItems] = useState([]);
+  const [memberId, setMemberId] = useState("");
 
   useEffect(() => {
     const fetchCartData = async () => {
       try {
-        const loginInfo = JSON.parse(localStorage.getItem("loginInfo")); // 로컬 스토리지에서 로그인 정보 가져오기
+        const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
 
         if (!loginInfo || !loginInfo.accessToken) {
           alert("로그인이 필요합니다.");
@@ -50,17 +51,16 @@ const ProductList = ({
         }
 
         const cartResponse = await axios.get("http://localhost:8080/carts", {
-          params: { memberId: loginInfo.memberId }, // memberId를 쿼리 파라미터로 전달
+          params: { memberId: loginInfo.memberId },
           headers: {
-            Authorization: `Bearer ${loginInfo.accessToken}`, // 토큰을 헤더에 추가
+            Authorization: `Bearer ${loginInfo.accessToken}`,
           },
-          withCredentials: true, // withCredentials 옵션 추가
+          withCredentials: true,
         });
 
         if (cartResponse.data.length > 0) {
-          const userCartItems = cartResponse.data;
-          setCartItems(userCartItems); // 장바구니 데이터 설정
-          setMemberId(loginInfo.memberId); // memberId 설정
+          setCartItems(cartResponse.data);
+          setMemberId(loginInfo.memberId);
         } else {
           console.log("장바구니 데이터가 비어 있습니다.");
         }
@@ -69,10 +69,11 @@ const ProductList = ({
       }
     };
 
-    fetchCartData(); // 컴포넌트가 마운트될 때 한 번 실행
+    fetchCartData();
   }, []);
+
   const handleAddToCart = async (product) => {
-    const loginInfo = JSON.parse(localStorage.getItem("loginInfo")); // 로컬 스토리지에서 로그인 정보 가져오기
+    const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
 
     if (!loginInfo || !loginInfo.accessToken) {
       alert("로그인이 필요합니다.");
@@ -85,14 +86,26 @@ const ProductList = ({
         console.error("상품 ID가 유효하지 않습니다.");
         return;
       }
-      // memberId에 해당하는 첫 번째 장바구니 아이템의 id를 cartId로 설정
-      const cartId = cartItems.length > 0 ? cartItems[0].id : null;
-      if (!cartId) {
-        console.error("회원의 장바구니를 찾을 수 없습니다.");
-        return;
+
+      let cartId = null;
+      if (cartItems.length > 0) {
+        cartId = cartItems[0].id;
+      } else {
+        // 카트가 없으면 카트 생성
+        const cartResponse = await axios.post(
+          "http://localhost:8080/carts",
+          { memberId: loginInfo.memberId },
+          {
+            headers: {
+              Authorization: `Bearer ${loginInfo.accessToken}`,
+            },
+            withCredentials: true,
+          }
+        );
+        cartId = cartResponse.data.id;
+        setCartItems([cartResponse.data]);
       }
 
-      // 장바구니에 추가할 상품 정보 설정
       const AddCartItemDto = {
         cartId: cartId,
         productId: product.id,
@@ -103,15 +116,14 @@ const ProductList = ({
       };
       console.log("AddCartItemDto:", AddCartItemDto);
 
-      // 서버에 POST 요청을 보내어 장바구니에 상품 추가
       const response = await axios.post(
         "http://localhost:8080/cartItems",
         AddCartItemDto,
         {
           headers: {
-            Authorization: `Bearer ${loginInfo.accessToken}`, // 토큰을 헤더에 추가
+            Authorization: `Bearer ${loginInfo.accessToken}`,
           },
-          withCredentials: true, // withCredentials 옵션 추가
+          withCredentials: true,
         }
       );
 
@@ -249,12 +261,10 @@ export async function getServerSideProps(context) {
   let totalPages = 0;
 
   try {
-    // 카테고리 데이터 가져오기
     const categoryResponse = await axios.get(
       "http://localhost:8080/categories"
     );
     categories = categoryResponse.data;
-    // 상품 데이터 가져오기
     const productResponse = await axios.get("http://localhost:8080/products", {
       params: {
         categoryId,

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Typography, Box } from "@mui/material";
+import styles from "./styles/MyPage.module.css";
 
 const MyPage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -36,25 +37,21 @@ const MyPage = () => {
   }
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-      }}
-    >
-      <h1>MyPage</h1>
-      <p>MyPage 페이지입니다.</p>
-      <Box sx={{ textAlign: "center" }}>
-        <Typography variant="h5">이름: {userInfo.name}</Typography>
-        <Typography variant="h5">이메일: {userInfo.email}</Typography>
-        <Typography variant="h5">
+    <Container className={styles.container}>
+      <h1>회원정보</h1>
+
+      <Box className={styles.box}>
+        <Typography variant="h5" className={styles.typography}>
+          이름: {userInfo.name}
+        </Typography>
+        <Typography variant="h5" className={styles.typography}>
+          이메일: {userInfo.email}
+        </Typography>
+        <Typography variant="h5" className={styles.typography}>
           생년월일: {userInfo.birthYear}년 {userInfo.birthMonth}월{" "}
           {userInfo.birthDay}일
         </Typography>
-        <Typography variant="h5">
+        <Typography variant="h5" className={styles.typography}>
           성별: {userInfo.gender === "M" ? "남자" : "여자"}
         </Typography>
       </Box>
