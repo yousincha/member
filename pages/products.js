@@ -11,26 +11,24 @@ import {
   Box,
 } from "@mui/material";
 import Link from "next/link";
-import myAxios from "../utils/myaxios";
-import { css } from "@emotion/react";
-import styled from "@emotion/styled";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const useStyles = {
-  container: css`
-    margin-top: 24px;
-  `,
-  productCard: css`
-    margin-bottom: 24px;
-  `,
-  media: css`
-    height: 0;
-    padding-top: 150%;
-  `,
-  gridContainer: css`
-    justify-content: center;
-  `,
+  container: {
+    marginTop: 24,
+  },
+  productCard: {
+    marginBottom: 24,
+  },
+  media: {
+    height: 0,
+    paddingTop: "150%",
+  },
+  gridContainer: {
+    justifyContent: "center",
+  },
 };
-
 const ProductList = ({
   categories,
   products,
@@ -38,31 +36,94 @@ const ProductList = ({
   totalPages,
   categoryId,
 }) => {
-  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [cartItems, setCartItems] = useState([]); // 장바구니 정보를 상태로 관리
+  const [memberId, setMemberId] = useState(""); // memberId 상태 관리
 
   useEffect(() => {
-    const loadImages = async () => {
-      await Promise.all(
-        products.map(
-          (product) =>
-            new Promise((resolve, reject) => {
-              const image = new Image();
-              image.src = product.imageUrl;
-              image.onload = resolve;
-              image.onerror = reject;
-            })
-        )
-      );
-      setImagesLoaded(true);
+    const fetchCartData = async () => {
+      try {
+        const loginInfo = JSON.parse(localStorage.getItem("loginInfo")); // 로컬 스토리지에서 로그인 정보 가져오기
+
+        if (!loginInfo || !loginInfo.accessToken) {
+          alert("로그인이 필요합니다.");
+          return;
+        }
+
+        const cartResponse = await axios.get("http://localhost:8080/carts", {
+          params: { memberId: loginInfo.memberId }, // memberId를 쿼리 파라미터로 전달
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`, // 토큰을 헤더에 추가
+          },
+          withCredentials: true, // withCredentials 옵션 추가
+        });
+
+        if (cartResponse.data.length > 0) {
+          const userCartItems = cartResponse.data;
+          setCartItems(userCartItems); // 장바구니 데이터 설정
+          setMemberId(loginInfo.memberId); // memberId 설정
+        } else {
+          console.log("장바구니 데이터가 비어 있습니다.");
+        }
+      } catch (error) {
+        console.error("Error fetching cart data:", error);
+      }
     };
 
-    loadImages();
-  }, [products]);
+    fetchCartData(); // 컴포넌트가 마운트될 때 한 번 실행
+  }, []);
+  const handleAddToCart = async (product) => {
+    const loginInfo = JSON.parse(localStorage.getItem("loginInfo")); // 로컬 스토리지에서 로그인 정보 가져오기
 
-  const emptyCardCount = 4 - (products.length % 4);
+    if (!loginInfo || !loginInfo.accessToken) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      // 상품 객체에서 productId가 null이 아닌지 확인
+      if (!product.id) {
+        console.error("상품 ID가 유효하지 않습니다.");
+        return;
+      }
+      // memberId에 해당하는 첫 번째 장바구니 아이템의 id를 cartId로 설정
+      const cartId = cartItems.length > 0 ? cartItems[0].id : null;
+      if (!cartId) {
+        console.error("회원의 장바구니를 찾을 수 없습니다.");
+        return;
+      }
+
+      // 장바구니에 추가할 상품 정보 설정
+      const AddCartItemDto = {
+        cartId: cartId,
+        productId: product.id,
+        productTitle: product.title,
+        productPrice: product.price,
+        productDescription: product.description,
+        quantity: 1,
+      };
+      console.log("AddCartItemDto:", AddCartItemDto);
+
+      // 서버에 POST 요청을 보내어 장바구니에 상품 추가
+      const response = await axios.post(
+        "http://localhost:8080/cartItems",
+        AddCartItemDto,
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`, // 토큰을 헤더에 추가
+          },
+          withCredentials: true, // withCredentials 옵션 추가
+        }
+      );
+
+      console.log("Added to cart:", response.data);
+      alert("장바구니에 상품이 추가되었습니다.");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
+  };
 
   return (
-    <Container css={useStyles.container}>
+    <Container style={useStyles.container}>
       <Grid container spacing={3}>
         <Grid item>
           <Link href={`/products`} passHref>
@@ -78,13 +139,13 @@ const ProductList = ({
         ))}
       </Grid>
 
-      <Grid container spacing={3} css={useStyles.gridContainer}>
+      <Grid container spacing={3} style={useStyles.gridContainer}>
         {products.length > 0 ? (
           products.map((product, index) => (
             <Grid item xs={12} sm={12} md={4} lg={4} key={index}>
-              <Card css={useStyles.productCard}>
+              <Card style={useStyles.productCard}>
                 <CardMedia
-                  css={useStyles.media}
+                  style={useStyles.media}
                   image={product.imageUrl}
                   title={product.title}
                 />
@@ -97,7 +158,12 @@ const ProductList = ({
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button variant="contained" color="primary" fullWidth>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={() => handleAddToCart(product)}
+                  >
                     장바구니 담기
                   </Button>
                 </CardActions>
@@ -117,12 +183,11 @@ const ProductList = ({
             }}
           >
             <Typography variant="h4" component="div">
-              해당 카테고리엔 상품이 없습니다.
+              해당 카테고리에 상품이 없습니다.
             </Typography>
           </Grid>
         )}
       </Grid>
-
       <Box display="flex" justifyContent="center" marginBottom={3}>
         <Link
           href={`/products?page=0${
@@ -184,10 +249,13 @@ export async function getServerSideProps(context) {
   let totalPages = 0;
 
   try {
-    const categoryResponse = await myAxios.get("/categories");
+    // 카테고리 데이터 가져오기
+    const categoryResponse = await axios.get(
+      "http://localhost:8080/categories"
+    );
     categories = categoryResponse.data;
-
-    const productResponse = await myAxios.get("/products", {
+    // 상품 데이터 가져오기
+    const productResponse = await axios.get("http://localhost:8080/products", {
       params: {
         categoryId,
         page,
@@ -197,7 +265,7 @@ export async function getServerSideProps(context) {
     pageNumber = parseInt(productResponse.data.pageable.pageNumber);
     totalPages = parseInt(productResponse.data.totalPages);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching initial data:", error);
   }
 
   return {

@@ -52,6 +52,9 @@ const DesktopAppBar = () => {
           </Typography>
         </Link>
         <div style={{ flexGrow: 1 }} />
+        <Link href="/carts" passHref>
+          <Button color="inherit">카트</Button>
+        </Link>
         <Link href="/products" passHref>
           <Button color="inherit">상품목록</Button>
         </Link>

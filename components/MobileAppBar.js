@@ -60,6 +60,7 @@ const MobileAppBar = ({ showBackButton }) => {
   };
 
   const menuItems = [
+    { text: "카트", link: "/carts" },
     { text: "제품", link: "/products" },
     isLoggedIn
       ? { text: "MyPage", link: "/mypage" }
