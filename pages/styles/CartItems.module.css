@@ -1,0 +1,60 @@
+/* CartItems.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.container h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.box {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 0;
+  border: 1px solid #ddd; /* 연한 회색 테두리 */
+  padding: 30px;
+  margin-bottom: 20px;
+  border-radius: 10px; /* 둥근 모서리 */
+  overflow-x: auto;
+}
+
+.box-list {
+  border-bottom: 1px solid #ccc;
+}
+
+.box-list .item {
+  padding: 12px;
+  text-align: left;
+}
+
+.box-list .item-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.box-list .item-description {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.box-list .item-price {
+  color: #333;
+  margin-bottom: 5px;
+}
+.box-list .item-total {
+  text-align: right;
+  color: #333;
+}
+.box-list .item-totalprice {
+  padding-top: 80px;
+  text-align: right;
+  color: #333;
+}

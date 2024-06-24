@@ -43,7 +43,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head>{/* 이곳에 웹 사이트에 필요한 태그를 추가하세요 */}</Head>
+        <Head></Head>
         <body>
           <Main />
           <NextScript />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Typography, Box } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import styles from "./styles/MyPage.module.css";
 
 const MyPage = () => {
@@ -8,12 +8,15 @@ const MyPage = () => {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
+      const storedLoginInfo = localStorage.getItem("loginInfo");
 
-      if (!loginInfo || !loginInfo.accessToken) {
+      if (!storedLoginInfo) {
+        alert("로그인이 필요합니다.");
         window.location.href = "/login";
         return;
       }
+
+      const loginInfo = JSON.parse(storedLoginInfo);
 
       try {
         const response = await axios.get("http://localhost:8080/members/info", {
@@ -24,7 +27,7 @@ const MyPage = () => {
 
         setUserInfo(response.data);
       } catch (error) {
-        console.error(error);
+        console.error("회원 정보를 가져오는 중 오류가 발생했습니다.", error);
         window.location.href = "/login";
       }
     };
@@ -38,23 +41,32 @@ const MyPage = () => {
 
   return (
     <Container className={styles.container}>
-      <h1>회원정보</h1>
-
-      <Box className={styles.box}>
-        <Typography variant="h5" className={styles.typography}>
-          이름: {userInfo.name}
-        </Typography>
-        <Typography variant="h5" className={styles.typography}>
-          이메일: {userInfo.email}
-        </Typography>
-        <Typography variant="h5" className={styles.typography}>
-          생년월일: {userInfo.birthYear}년 {userInfo.birthMonth}월{" "}
-          {userInfo.birthDay}일
-        </Typography>
-        <Typography variant="h5" className={styles.typography}>
-          성별: {userInfo.gender === "M" ? "남자" : "여자"}
-        </Typography>
-      </Box>
+      <h1>Info.</h1>
+      <div className={styles["table-container"]}>
+        <table className={styles.table}>
+          <tbody>
+            <tr>
+              <th>이름</th>
+              <td>{userInfo.name}</td>
+            </tr>
+            <tr>
+              <th>이메일</th>
+              <td>{userInfo.email}</td>
+            </tr>
+            <tr>
+              <th>생년월일</th>
+              <td>
+                {userInfo.birthYear}년 {userInfo.birthMonth}월{" "}
+                {userInfo.birthDay}일
+              </td>
+            </tr>
+            <tr>
+              <th>성별</th>
+              <td>{userInfo.gender === "M" ? "남자" : "여자"}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </Container>
   );
 };

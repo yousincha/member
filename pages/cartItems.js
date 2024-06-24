@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Typography, Box, Card, CardContent } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
+import styles from "./styles/CartItems.module.css"; // CSS 모듈 임포트
 
 const CartItems = () => {
   const [itemsInfo, setItemsInfo] = useState([]);
@@ -38,48 +46,60 @@ const CartItems = () => {
     return <div>Loading...</div>;
   }
 
+  const calculateTotalPrice = (price, quantity) => {
+    return price * quantity;
+  };
+
+  const calculateTotalSum = () => {
+    let totalSum = 0;
+    itemsInfo.forEach((item) => {
+      totalSum += calculateTotalPrice(item.productPrice, item.quantity);
+    });
+    return totalSum;
+  };
   return (
-    <Container
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-      }}
-    >
-      <h1>'{loginInfo.nickname}'님의 장바구니</h1>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          justifyContent: "flex-start",
-          gap: "20px",
-          width: "100%",
-          maxWidth: 1200,
-          margin: "auto",
-        }}
-      >
+    <Container className={styles.container}>
+      <h1>Cart.</h1>
+      <Box className={styles.box}>
         {itemsInfo.length > 0 ? (
-          itemsInfo.map((item) => (
-            <Card
-              key={item.id}
-              sx={{ maxWidth: 350, flexGrow: 1, marginBottom: 20 }}
-            >
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  상품명: {item.productTitle}
-                </Typography>
-                <Typography variant="body1">
-                  상품 상세: {item.productDescription}
-                </Typography>
-                <Typography variant="body1">
-                  가격: {item.productPrice} | 수량: {item.quantity}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))
+          <List>
+            {itemsInfo.map((item) => (
+              <ListItem key={item.id} className={styles["box-list"]}>
+                <ListItemText
+                  primary={
+                    <Typography className={`${styles["item-title"]} `}>
+                      상품명: {item.productTitle}
+                    </Typography>
+                  }
+                  secondary={
+                    <>
+                      <Typography className={styles["item-description"]}>
+                        상품 상세: {item.productDescription}
+                      </Typography>
+                      <Typography className={styles["item-price"]}>
+                        가격: {item.productPrice} | 수량: {item.quantity}
+                      </Typography>
+                      <Typography className={styles["item-total"]}>
+                        + 총 금액:{" "}
+                        {calculateTotalPrice(item.productPrice, item.quantity)}
+                      </Typography>
+                    </>
+                  }
+                />
+              </ListItem>
+            ))}{" "}
+            <ListItem className={styles["box-list"]} disableTypography>
+              <ListItemText
+                className={styles["item-totalprice"]}
+                primary={
+                  <Typography variant="body1">
+                    전체 총 합계: {calculateTotalSum()}
+                  </Typography>
+                }
+                secondary={<></>}
+              />
+            </ListItem>
+          </List>
         ) : (
           <Typography variant="h6">카트가 비어 있습니다.</Typography>
         )}
@@ -87,4 +107,5 @@ const CartItems = () => {
     </Container>
   );
 };
+
 export default CartItems;
