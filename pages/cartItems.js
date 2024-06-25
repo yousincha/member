@@ -35,7 +35,7 @@ const CartItems = () => {
         setItemsInfo(response.data);
       } catch (error) {
         console.error("빈 카트 입니다.", error);
-        setItemsInfo([]); // 빈 카트 처리
+        setItemsInfo([]);
       }
     };
 

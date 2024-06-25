@@ -3,7 +3,6 @@ import { Container, Box, Typography, TextField, Button } from "@mui/material";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
 const StyledContainer = styled(Container)`
@@ -21,6 +20,18 @@ const StyledForm = styled(Box)`
   display: flex;
   flex-direction: column;
   width: 100%;
+`;
+
+const LoginButton = styled(Button)`
+  background-color: black;
+  color: white;
+  &:hover {
+    background-color: #333;
+  }
+`;
+
+const LinkButton = styled(Button)`
+  color: black;
 `;
 
 const Login = () => {
@@ -83,21 +94,15 @@ const Login = () => {
             {errorMessage}
           </Typography>
         )}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="large"
-          fullWidth
-        >
+        <LoginButton type="submit" variant="contained" size="large" fullWidth>
           로그인
-        </Button>
+        </LoginButton>
 
         <Link href="/joinform" passHref>
-          <Button color="inherit">회원가입</Button>
+          <LinkButton>회원가입</LinkButton>
         </Link>
         <Link href="/findpassword" passHref>
-          <Button color="inherit">암호를 잊었어요.</Button>
+          <LinkButton>암호를 잊었어요.</LinkButton>
         </Link>
       </StyledForm>
     </StyledContainer>

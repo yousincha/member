@@ -20,11 +20,16 @@ const StyledContainer = styled(Container)({
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
-  maxWidth: "500px",
   height: "100%",
   margin: "0 auto",
 });
-
+const SignupButton = styled(Button)({
+  backgroundColor: "black",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "#333",
+  },
+});
 const StyledForm = styled(Box)({
   display: "flex",
   flexDirection: "column",
@@ -77,6 +82,7 @@ const JoinForm = () => {
       <form onSubmit={handleSubmit}>
         <StyledForm>
           <TextField
+            sx={{ width: "500px" }}
             label="회원이름"
             type="text"
             variant="outlined"
@@ -124,15 +130,14 @@ const JoinForm = () => {
               <MenuItem value="F">여성</MenuItem>
             </Select>
           </FormControl>
-          <Button
+          <SignupButton
             type="submit"
             variant="contained"
-            color="primary"
             size="large"
             fullWidth
           >
             회원가입
-          </Button>
+          </SignupButton>
         </StyledForm>
       </form>
     </StyledContainer>

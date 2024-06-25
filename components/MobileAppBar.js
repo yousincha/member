@@ -70,7 +70,7 @@ const MobileAppBar = ({ showBackButton }) => {
   ].filter(Boolean);
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ backgroundColor: "#000" }}>
       <Toolbar>
         {showBackButton ? (
           <Link href="/" passHref>
@@ -80,9 +80,8 @@ const MobileAppBar = ({ showBackButton }) => {
           </Link>
         ) : (
           <Link href="/" passHref>
-            <Typography variant="h6" style={{ flexGrow: 1 }}>
-              <img src="https://via.placeholder.com/30" alt="logo" width="30" />{" "}
-              Meet42
+            <Typography variant="h6" sx={{ flexGrow: 1, color: "white" }}>
+              <img src="/cart.png" alt="logo" width="30" />
             </Typography>
           </Link>
         )}
@@ -102,7 +101,7 @@ const MobileAppBar = ({ showBackButton }) => {
               item.link ? (
                 <Link key={index} href={item.link} passHref>
                   <ListItemButton onClick={toggleDrawer(false)}>
-                    <ListItemText primary={item.text} />
+                    <ListItemText primary={item.text} sx={{ color: "black" }} />
                   </ListItemButton>
                 </Link>
               ) : (
@@ -115,7 +114,7 @@ const MobileAppBar = ({ showBackButton }) => {
                     }
                   }}
                 >
-                  <ListItemText primary={item.text} />
+                  <ListItemText primary={item.text} sx={{ color: "black" }} />
                 </ListItemButton>
               )
             )}

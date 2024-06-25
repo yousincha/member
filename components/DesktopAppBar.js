@@ -41,7 +41,7 @@ const DesktopAppBar = () => {
   }, []);
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ backgroundColor: "#333" }}>
       <Toolbar>
         <Link href="/" passHref>
           <Typography
@@ -56,15 +56,19 @@ const DesktopAppBar = () => {
           <Button color="inherit">카트</Button>
         </Link> */}
         <Link href="/products" passHref>
-          <Button color="inherit">상품목록</Button>
+          <Button color="inherit" style={{ color: "white" }}>
+            상품목록
+          </Button>
         </Link>
         <Link href="/cartItems" passHref>
-          <Button color="inherit">장바구니</Button>
+          <Button color="inherit" style={{ color: "white" }}>
+            장바구니
+          </Button>
         </Link>
         <Link href="/mypage" passHref>
           <Button
             color="inherit"
-            style={{ display: isLoggedIn ? "block" : "none" }}
+            style={{ color: "white", display: isLoggedIn ? "block" : "none" }}
           >
             MyPage
           </Button>
@@ -72,14 +76,14 @@ const DesktopAppBar = () => {
         <Link href="/login" passHref>
           <Button
             color="inherit"
-            style={{ display: isLoggedIn ? "none" : "block" }}
+            style={{ color: "white", display: isLoggedIn ? "none" : "block" }}
           >
             로그인
           </Button>
         </Link>
         <Button
           color="inherit"
-          style={{ display: isLoggedIn ? "block" : "none" }}
+          style={{ color: "white", display: isLoggedIn ? "block" : "none" }}
           onClick={handleLogoutDialogOpen}
         >
           로그아웃
