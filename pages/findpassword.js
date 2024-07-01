@@ -44,7 +44,11 @@ const FindPassword = () => {
       setSuccessMessage("비밀번호 재설정 링크가 이메일로 전송되었습니다.");
       setErrorMessage("");
     } catch (error) {
-      setErrorMessage("비밀번호 찾기 요청 중 오류가 발생했습니다.");
+      if (error.response && error.response.status === 404) {
+        setErrorMessage("등록된 이메일이 아닙니다. 다시 확인해주세요.");
+      } else {
+        setErrorMessage("비밀번호 찾기 요청 중 오류가 발생했습니다.");
+      }
       setSuccessMessage("");
       console.error("Error finding password:", error);
     }
