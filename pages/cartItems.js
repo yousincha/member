@@ -20,7 +20,7 @@ const CartItems = () => {
         const storedLoginInfo = localStorage.getItem("loginInfo");
         if (!storedLoginInfo) {
           alert("로그인이 필요합니다.");
-          window.location.href = "/login"; // 로그인 페이지로 리디렉션
+          window.location.href = "/login";
           return;
         }
         const loginInfo = JSON.parse(storedLoginInfo);
