@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import myAxios from "../utils/myaxios"; // 커스텀 axios 인스턴스를 사용
+import myAxios from "../utils/myaxios"; // Custom axios instance
 import { Container, Typography, TextField, Button, Alert } from "@mui/material";
 import styled from "@emotion/styled";
 import Link from "next/link";
@@ -25,32 +25,34 @@ const ResetPassword = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    // 페이지 로드 시, URL에서 reset token을 가져옵니다.
-    const resetToken = router.query.token;
+    const queryToken = new URLSearchParams(window.location.search).get("token");
 
-    if (!resetToken) {
+    if (!queryToken) {
       setErrorMessage(
         "잘못된 접근입니다. 이메일을 통해 유효한 링크로 접속해주세요."
       );
       return;
     }
 
-    // 서버에서 reset token의 유효성을 검사합니다.
-    const checkResetTokenValidity = async () => {
+    const checkResetTokenValidity = async (resetToken) => {
       try {
-        const response = await myAxios.get("/validate-reset-token", {
+        const response = await myAxios.get("/members/resettoken", {
           params: { resetToken },
         });
-        // 서버로부터 유효한 토큰인 경우
         setResetTokenValid(true);
       } catch (error) {
-        // 서버로부터 유효하지 않은 토큰 또는 다른 오류인 경우
-        setErrorMessage("링크가 만료되었거나 잘못된 링크입니다.");
+        if (error.response && error.response.status === 400) {
+          setErrorMessage("링크가 만료되었거나 잘못된 링크입니다.");
+        } else {
+          setErrorMessage(
+            "서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+          );
+        }
       }
     };
 
-    checkResetTokenValidity();
-  }, [router.query.token]);
+    checkResetTokenValidity(queryToken);
+  }, []);
 
   const handlePasswordReset = async () => {
     if (newPassword !== confirmPassword) {
@@ -59,16 +61,23 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await myAxios.post("/reset-password", {
-        resetToken: router.query.token,
+      const response = await myAxios.post("/members/resetpassword", {
+        resetToken: new URLSearchParams(window.location.search).get("token"),
         newPassword,
       });
-      setSuccessMessage("비밀번호가 성공적으로 재설정되었습니다.");
+
+      setSuccessMessage(response.data);
       setErrorMessage("");
-      // 여기에서 원하는 처리를 추가할 수 있습니다. 예를 들어 로그인 페이지로 리다이렉트하는 등의 동작.
     } catch (error) {
-      setErrorMessage("비밀번호 재설정 중 오류가 발생했습니다.");
-      console.error("Error resetting password:", error);
+      if (error.response && error.response.status === 500) {
+        setErrorMessage(
+          "서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        );
+      } else if (error.response && error.response.data) {
+        setErrorMessage(`비밀번호 재설정 중 오류 발생: ${error.response.data}`);
+      } else {
+        setErrorMessage("비밀번호 재설정 중 오류가 발생했습니다.");
+      }
     }
   };
 
