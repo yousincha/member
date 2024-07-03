@@ -49,12 +49,15 @@
   color: #333;
   margin-bottom: 5px;
 }
+
 .box-list .item-total {
-  text-align: right;
+  text-align: right; /* 총 금액을 오른쪽 정렬 */
   color: #333;
+  display: block;
 }
+
 .box-list .item-totalprice {
   padding-top: 80px;
-  text-align: right;
+  text-align: right; /* 전체 총 합계를 오른쪽 정렬 */
   color: #333;
 }

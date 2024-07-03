@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import axios from "axios";
-import Cookies from "js-cookie";
-import { ThemeProvider } from "@mui/material/styles"; // ThemeProvider 불러오기
+import { ThemeProvider } from "@mui/material/styles";
 import theme from "../styles/theme";
+
 const useStyles = {
   container: {
     marginTop: 24,
@@ -63,7 +63,7 @@ const ProductList = ({
           setCartItems(cartResponse.data);
           setMemberId(loginInfo.memberId);
         } else {
-          console.log("장바구니 데이터가 비어 있습니다.");
+          console.log("장바구니가 생성되지 않았습니다.");
         }
       } catch (error) {
         console.error("Error fetching cart data:", error);
@@ -82,7 +82,6 @@ const ProductList = ({
     }
 
     try {
-      // 상품 객체에서 productId가 null이 아닌지 확인
       if (!product.id) {
         console.error("상품 ID가 유효하지 않습니다.");
         return;
@@ -92,7 +91,6 @@ const ProductList = ({
       if (cartItems.length > 0) {
         cartId = cartItems[0].id;
       } else {
-        // 카트가 없으면 카트 생성
         const cartResponse = await axios.post(
           "http://localhost:8080/carts",
           { memberId: loginInfo.memberId },
@@ -115,7 +113,6 @@ const ProductList = ({
         productDescription: product.description,
         quantity: 1,
       };
-      console.log("AddCartItemDto:", AddCartItemDto);
 
       const response = await axios.post(
         "http://localhost:8080/cartItems",
@@ -128,7 +125,9 @@ const ProductList = ({
         }
       );
 
-      console.log("Added to cart:", response.data);
+      const updatedCartItem = response.data;
+      setCartItems((prevCartItems) => [...prevCartItems, updatedCartItem]);
+
       alert("장바구니에 상품이 추가되었습니다.");
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -155,35 +154,46 @@ const ProductList = ({
 
         <Grid container spacing={3} style={useStyles.gridContainer}>
           {products.length > 0 ? (
-            products.map((product, index) => (
-              <Grid item xs={12} sm={12} md={4} lg={4} key={index}>
-                <Card style={useStyles.productCard}>
-                  <CardMedia
-                    style={useStyles.media}
-                    image={product.imageUrl}
-                    title={product.title}
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {product.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {product.price}원
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      fullWidth
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      장바구니 담기
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))
+            products.map((product, index) => {
+              const cartItem = cartItems.find(
+                (item) => item.productId === product.id
+              );
+
+              return (
+                <Grid item xs={12} sm={12} md={4} lg={4} key={index}>
+                  <Card style={useStyles.productCard}>
+                    <CardMedia
+                      style={useStyles.media}
+                      image={product.imageUrl}
+                      title={product.title}
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="div">
+                        {product.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {product.price}원
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {cartItem
+                          ? `장바구니 담긴 수량: ${cartItem.quantity}`
+                          : "장바구니에 담기지 않은 상품입니다."}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={() => handleAddToCart(product)}
+                      >
+                        장바구니 담기
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              );
+            })
           ) : (
             <Grid
               item

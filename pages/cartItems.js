@@ -57,6 +57,7 @@ const CartItems = () => {
     });
     return totalSum;
   };
+
   return (
     <Container className={styles.container}>
       <h1>Cart.</h1>
@@ -67,19 +68,33 @@ const CartItems = () => {
               <ListItem key={item.id} className={styles["box-list"]}>
                 <ListItemText
                   primary={
-                    <Typography className={`${styles["item-title"]} `}>
+                    <Typography
+                      className={`${styles["item-title"]}`}
+                      component="span"
+                    >
                       상품명: {item.productTitle}
                     </Typography>
                   }
                   secondary={
                     <>
-                      <Typography className={styles["item-description"]}>
+                      <Typography
+                        className={styles["item-description"]}
+                        component="span"
+                      >
                         상품 상세: {item.productDescription}
                       </Typography>
-                      <Typography className={styles["item-price"]}>
+                      <br />
+                      <Typography
+                        className={styles["item-price"]}
+                        component="span"
+                      >
                         가격: {item.productPrice} | 수량: {item.quantity}
                       </Typography>
-                      <Typography className={styles["item-total"]}>
+                      <br />
+                      <Typography
+                        className={styles["item-total"]} // 오른쪽 정렬을 위한 CSS 클래스
+                        component="span" // div 요소로 변경
+                      >
                         + 총 금액:{" "}
                         {calculateTotalPrice(item.productPrice, item.quantity)}
                       </Typography>
@@ -87,12 +102,12 @@ const CartItems = () => {
                   }
                 />
               </ListItem>
-            ))}{" "}
-            <ListItem className={styles["box-list"]} disableTypography>
+            ))}
+            <ListItem className={styles["box-list"]}>
               <ListItemText
                 className={styles["item-totalprice"]}
                 primary={
-                  <Typography variant="body1">
+                  <Typography variant="body1" component="span">
                     전체 총 합계: {calculateTotalSum()}
                   </Typography>
                 }
