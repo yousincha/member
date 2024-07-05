@@ -114,6 +114,22 @@ const ProductList = ({
         quantity: 1,
       };
 
+      // 업데이트 된 상태를 먼저 반영
+      setCartItems((prevCartItems) => {
+        const existingCartItem = prevCartItems.find(
+          (item) => item.productId === product.id
+        );
+        if (existingCartItem) {
+          return prevCartItems.map((item) =>
+            item.productId === product.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        } else {
+          return [...prevCartItems, AddCartItemDto];
+        }
+      });
+
       const response = await axios.post(
         "http://localhost:8080/cartItems",
         AddCartItemDto,
@@ -126,7 +142,18 @@ const ProductList = ({
       );
 
       const updatedCartItem = response.data;
-      setCartItems((prevCartItems) => [...prevCartItems, updatedCartItem]);
+      setCartItems((prevCartItems) => {
+        const existingCartItemIndex = prevCartItems.findIndex(
+          (item) => item.productId === updatedCartItem.productId
+        );
+        if (existingCartItemIndex !== -1) {
+          const updatedCartItems = [...prevCartItems];
+          updatedCartItems[existingCartItemIndex] = updatedCartItem;
+          return updatedCartItems;
+        } else {
+          return [...prevCartItems, updatedCartItem];
+        }
+      });
 
       alert("장바구니에 상품이 추가되었습니다.");
     } catch (error) {
@@ -177,7 +204,7 @@ const ProductList = ({
                       <Typography variant="body2" color="text.secondary">
                         {cartItem
                           ? `장바구니 담긴 수량: ${cartItem.quantity}`
-                          : "장바구니에 담기지 않은 상품입니다."}
+                          : "장바구니에 담아보세요"}{" "}
                       </Typography>
                     </CardContent>
                     <CardActions>

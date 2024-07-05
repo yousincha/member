@@ -1,13 +1,17 @@
-.container {
+.bannerImage {
+  width: 100%; /* 이미지 너비를 100%로 설정하여 부모 요소의 너비에 맞춤 */
+  object-fit: cover; /* 이미지를 비율 유지하며 부모 요소에 맞추기 */
+}
+.slick-slider {
+  margin: 0 auto;
+  width: 80%;
+}
+
+.slick-slide img {
   position: relative; /* 부모 요소로부터 상대적 위치 설정 */
   height: 100%; /* 화면 높이에 꽉 차도록 설정 */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.bannerImage {
-  width: 100%; /* 이미지 너비를 100%로 설정하여 부모 요소의 너비에 맞춤 */
-  object-fit: cover; /* 이미지를 비율 유지하며 부모 요소에 맞추기 */
 }
