@@ -12,7 +12,6 @@ class MyDocument extends Document {
   static async getInitialProps(ctx) {
     const originalRenderPage = ctx.renderPage;
 
-    // Render app and page and get the context of the page with collected side effects
     ctx.renderPage = () =>
       originalRenderPage({
         enhanceApp: (App) => (props) =>

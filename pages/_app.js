@@ -4,7 +4,7 @@ import { Container } from "@mui/material";
 import AppBar from "../components/AppBar";
 import { createTheme } from "@mui/material/styles";
 import myAxios from "../utils/myaxios";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
@@ -35,12 +35,13 @@ const StyledContainer = styled(Container)`
 `;
 
 function MyApp({ Component, pageProps }) {
+  const router = useRouter(); // useRouter 훅 사용
+
   useEffect(() => {
     const refreshTokenInterval = setInterval(async () => {
-      const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
-
-      console.log(loginInfo);
-      if (loginInfo) {
+      const storedLoginInfo = localStorage.getItem("loginInfo");
+      if (storedLoginInfo) {
+        const loginInfo = JSON.parse(storedLoginInfo);
         const { accessToken, refreshToken } = loginInfo;
 
         try {
@@ -54,14 +55,14 @@ function MyApp({ Component, pageProps }) {
             }
           );
 
-          const loginInfo = response.data;
-          localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+          const newLoginInfo = response.data;
+          localStorage.setItem("loginInfo", JSON.stringify(newLoginInfo));
         } catch (error) {
-          console.error(error);
+          console.error("토큰 갱신 실패:", error);
 
           localStorage.removeItem("loginInfo");
           window.dispatchEvent(new CustomEvent("loginStatusChanged"));
-          Router.push("/");
+          router.push("/"); // router.push 사용
         }
       }
     }, 10 * 1000);
@@ -69,7 +70,7 @@ function MyApp({ Component, pageProps }) {
     return () => {
       clearInterval(refreshTokenInterval);
     };
-  }, []);
+  }, [router]);
 
   return (
     <ThemeProvider theme={theme}>
