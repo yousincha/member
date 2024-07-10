@@ -11,6 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import styles from "./styles/CartItems.module.css"; // CSS 모듈 임포트
+import requestPay from "./services/paymentService"; // paymentService.js에서 requestPay import
 
 const CartItems = () => {
   const [itemsInfo, setItemsInfo] = useState([]);
@@ -58,11 +59,16 @@ const CartItems = () => {
     };
   }, []);
 
-  const calculateTotalPrice = (price, quantity) => {
-    return price * quantity;
+  const handleCheckout = async () => {
+    try {
+      const result = await requestPay(loginInfo, itemsInfo);
+      alert(result); // 성공 메시지 출력
+      setItemsInfo([]); // 결제 후 카트 아이템 정보 초기화
+    } catch (error) {
+      alert(error); // 실패 메시지 출력
+    }
   };
-
-  const calculateTotalSum = () => {
+  const calculateTotalSum = (itemsInfo) => {
     let totalSum = 0;
     itemsInfo.forEach((item) => {
       totalSum += calculateTotalPrice(item.productPrice, item.quantity);
@@ -70,67 +76,9 @@ const CartItems = () => {
     return totalSum;
   };
 
-  const requestPay = () => {
-    const { IMP } = window;
-    IMP.init("imp07380687");
-    const totalPrice = calculateTotalSum();
-    IMP.request_pay(
-      {
-        pg: "kakaopay.TC0ONETIME",
-        pay_method: "card",
-        merchant_uid: new Date().getTime(),
-        name: "테스트 상품",
-        amount: totalPrice,
-        buyer_email: "test@gmail.com",
-        buyer_name: "cozy",
-        buyer_tel: "010-1234-5678",
-        buyer_addr: "서울특별시",
-        buyer_postcode: "123-456",
-      },
-      async (rsp) => {
-        if (rsp.success) {
-          try {
-            // GET 요청으로 변경
-            const response = await axios.get(
-              `http://localhost:8080/paymentInfos/${rsp.imp_uid}`,
-              {
-                params: rsp, // rsp 객체를 쿼리 매개변수로 전달합니다.
-              }
-            );
-            console.log(rsp.imp_uid);
-            if (rsp.paid_amount === response.data.paid_amount) {
-              alert("결제 성공");
-              // 결제 성공 시, 서버에 삭제 요청
-              await axios.delete(
-                "http://localhost:8080/cartItems/deleteAfterPayment",
-                {
-                  data: itemsInfo.map((item) => item.id),
-                  headers: {
-                    Authorization: `Bearer ${loginInfo.accessToken}`,
-                  },
-                }
-              );
-
-              // 결제 후 카트 아이템 정보 갱신
-              setItemsInfo([]);
-            } else {
-              alert("결제 실패: 금액 불일치");
-            }
-          } catch (error) {
-            console.error("Error while verifying payment:", error);
-            alert("결제 실패: 서버 오류");
-          }
-        } else {
-          alert(`결제 실패: ${rsp.error_msg}`);
-        }
-      }
-    );
+  const calculateTotalPrice = (price, quantity) => {
+    return price * quantity;
   };
-
-  const handleCheckout = () => {
-    requestPay(); // 결제 함수 호출
-  };
-
   if (!loginInfo) {
     return <div>Loading...</div>;
   }
@@ -185,7 +133,7 @@ const CartItems = () => {
                 className={styles["item-totalprice"]}
                 primary={
                   <Typography variant="body1" component="span">
-                    전체 총 합계: {calculateTotalSum()}
+                    전체 총 합계: {calculateTotalSum(itemsInfo)}
                   </Typography>
                 }
                 secondary={<></>}
