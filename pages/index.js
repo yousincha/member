@@ -1,3 +1,5 @@
+// HomePage component
+
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Typography } from "@mui/material";
 import styles from "./styles/HomePage.module.css";
@@ -29,14 +31,13 @@ const HomePage = () => {
   };
 
   return (
-    <div className={styles.main}>
+    <div>
       <Container className={styles.container}>
         <Typography
           variant="h4"
           gutterBottom
-          className={styles.banner}
           fontWeight="bold"
-          textAlign={"center"}
+          textAlign="center"
         >
           CozyCorner
         </Typography>

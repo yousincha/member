@@ -100,6 +100,19 @@ const CartItems = () => {
             console.log(rsp.imp_uid);
             if (rsp.paid_amount === response.data.paid_amount) {
               alert("결제 성공");
+              // 결제 성공 시, 서버에 삭제 요청
+              await axios.delete(
+                "http://localhost:8080/cartItems/deleteAfterPayment",
+                {
+                  data: itemsInfo.map((item) => item.id),
+                  headers: {
+                    Authorization: `Bearer ${loginInfo.accessToken}`,
+                  },
+                }
+              );
+
+              // 결제 후 카트 아이템 정보 갱신
+              setItemsInfo([]);
             } else {
               alert("결제 실패: 금액 불일치");
             }
