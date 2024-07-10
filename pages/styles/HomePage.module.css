@@ -1,17 +1,87 @@
-.bannerImage {
-  width: 100%; /* 이미지 너비를 100%로 설정하여 부모 요소의 너비에 맞춤 */
-  object-fit: cover; /* 이미지를 비율 유지하며 부모 요소에 맞추기 */
-}
-.slick-slider {
-  margin: 0 auto;
-  width: 80%;
-}
+/* styles/HomePage.module.css */
 
-.slick-slide img {
-  position: relative; /* 부모 요소로부터 상대적 위치 설정 */
-  height: 100%; /* 화면 높이에 꽉 차도록 설정 */
+.main {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.banner {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
+  width: 100%;
   justify-content: center;
   align-items: center;
+}
+
+.slider {
+  position: relative;
+  width: 100%;
+  max-width: 80%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 100%;
+}
+
+.slide {
+  min-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bannerImage {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.dots {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 5px;
+  background-color: gray;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: black;
+}
+
+/* 화면 크기에 따라 슬라이더의 최대 너비를 조정 */
+@media (max-width: 1280px) {
+  .slider {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .slider {
+    max-width: 100%;
+  }
 }
