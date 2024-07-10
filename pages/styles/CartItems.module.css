@@ -61,3 +61,8 @@
   text-align: right; /* 전체 총 합계를 오른쪽 정렬 */
   color: #333;
 }
+
+.box-list button {
+  background-color: black; /* 배경색을 블랙으로 지정 */
+  color: white;
+}

@@ -73,14 +73,14 @@ const CartItems = () => {
   const requestPay = () => {
     const { IMP } = window;
     IMP.init("imp07380687");
-
+    const totalPrice = calculateTotalSum();
     IMP.request_pay(
       {
         pg: "kakaopay.TC0ONETIME",
         pay_method: "card",
         merchant_uid: new Date().getTime(),
         name: "테스트 상품",
-        amount: 1004,
+        amount: totalPrice,
         buyer_email: "test@gmail.com",
         buyer_name: "cozy",
         buyer_tel: "010-1234-5678",
@@ -88,18 +88,27 @@ const CartItems = () => {
         buyer_postcode: "123-456",
       },
       async (rsp) => {
-        try {
-          const { data } = await axios.post(
-            "http://localhost:8080/verifyIamport/" + rsp.imp_uid
-          );
-          if (rsp.paid_amount === data.response.amount) {
-            alert("결제 성공");
-          } else {
-            alert("결제 실패");
+        if (rsp.success) {
+          try {
+            // GET 요청으로 변경
+            const response = await axios.get(
+              `http://localhost:8080/paymentInfos/${rsp.imp_uid}`,
+              {
+                params: rsp, // rsp 객체를 쿼리 매개변수로 전달합니다.
+              }
+            );
+            console.log(rsp.imp_uid);
+            if (rsp.paid_amount === response.data.paid_amount) {
+              alert("결제 성공");
+            } else {
+              alert("결제 실패: 금액 불일치");
+            }
+          } catch (error) {
+            console.error("Error while verifying payment:", error);
+            alert("결제 실패: 서버 오류");
           }
-        } catch (error) {
-          console.error("Error while verifying payment:", error);
-          alert("결제 실패");
+        } else {
+          alert(`결제 실패: ${rsp.error_msg}`);
         }
       }
     );
