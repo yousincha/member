@@ -1,6 +1,11 @@
 import axios from "axios";
 
-const requestPay = async (loginInfo, itemsInfo) => {
+const requestPay = async (
+  loginInfo,
+  itemsInfo,
+  calculateTotalSum,
+  calculateTotalPrice
+) => {
   const { IMP } = window;
   IMP.init("imp07380687");
   const totalPrice = calculateTotalSum(itemsInfo);

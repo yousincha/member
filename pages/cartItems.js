@@ -8,13 +8,16 @@ import {
   List,
   ListItem,
   ListItemText,
+  Checkbox,
   Button,
 } from "@mui/material";
 import styles from "./styles/CartItems.module.css"; // CSS 모듈 임포트
 import requestPay from "./services/paymentService"; // paymentService.js에서 requestPay import
+import cancelCart from "./services/cancelService"; // cancelService.js에서 cancelCart import
 
 const CartItems = () => {
   const [itemsInfo, setItemsInfo] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]); // 선택된 아이템들 상태
   const [loginInfo, setLoginInfo] = useState(null);
   const router = useRouter(); // useRouter 훅 사용
 
@@ -59,18 +62,61 @@ const CartItems = () => {
     };
   }, []);
 
+  const handleItemCheck = (itemId) => {
+    setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.includes(itemId)) {
+        return prevSelectedItems.filter((id) => id !== itemId);
+      } else {
+        return [...prevSelectedItems, itemId];
+      }
+    });
+  };
+
   const handleCheckout = async () => {
+    const selectedItemsInfo = itemsInfo.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+
+    if (selectedItemsInfo.length === 0) {
+      alert("결제할 상품을 선택하세요.");
+      return;
+    }
+
     try {
-      const result = await requestPay(loginInfo, itemsInfo);
+      const result = await requestPay(
+        loginInfo,
+        selectedItemsInfo,
+        calculateTotalSum,
+        calculateTotalPrice
+      );
       alert(result); // 성공 메시지 출력
-      setItemsInfo([]); // 결제 후 카트 아이템 정보 초기화
+      setItemsInfo((prevItemsInfo) =>
+        prevItemsInfo.filter((item) => !selectedItems.includes(item.id))
+      ); // 결제된 상품들을 카트에서 제거
+      setSelectedItems([]); // 선택된 상품 초기화
     } catch (error) {
       alert(error); // 실패 메시지 출력
     }
   };
-  const calculateTotalSum = (itemsInfo) => {
+
+  const handleCancel = async (itemId) => {
+    try {
+      const result = await cancelCart(loginInfo, [itemId]);
+      alert(result); // 성공 메시지 출력
+      setItemsInfo((prevItemsInfo) =>
+        prevItemsInfo.filter((item) => item.id !== itemId)
+      ); // 삭제된 상품들을 카트에서 제거
+      setSelectedItems((prevSelectedItems) =>
+        prevSelectedItems.filter((id) => id !== itemId)
+      ); // 선택된 상품에서 제거
+    } catch (error) {
+      alert(error); // 실패 메시지 출력
+    }
+  };
+
+  const calculateTotalSum = (items) => {
     let totalSum = 0;
-    itemsInfo.forEach((item) => {
+    items.forEach((item) => {
       totalSum += calculateTotalPrice(item.productPrice, item.quantity);
     });
     return totalSum;
@@ -79,6 +125,7 @@ const CartItems = () => {
   const calculateTotalPrice = (price, quantity) => {
     return price * quantity;
   };
+
   if (!loginInfo) {
     return <div>Loading...</div>;
   }
@@ -91,6 +138,10 @@ const CartItems = () => {
           <List>
             {itemsInfo.map((item) => (
               <ListItem key={item.id} className={styles["box-list"]}>
+                <Checkbox
+                  checked={selectedItems.includes(item.id)}
+                  onChange={() => handleItemCheck(item.id)}
+                />
                 <ListItemText
                   primary={
                     <Typography
@@ -117,12 +168,20 @@ const CartItems = () => {
                       </Typography>
                       <br />
                       <Typography
-                        className={styles["item-total"]} // 오른쪽 정렬을 위한 CSS 클래스
-                        component="span" // div 요소로 변경
+                        className={styles["item-total"]}
+                        component="span"
                       >
                         + 총 금액:{" "}
                         {calculateTotalPrice(item.productPrice, item.quantity)}
                       </Typography>
+                      <br />
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleCancel(item.id)}
+                      >
+                        삭제하기
+                      </Button>
                     </>
                   }
                 />
@@ -133,7 +192,12 @@ const CartItems = () => {
                 className={styles["item-totalprice"]}
                 primary={
                   <Typography variant="body1" component="span">
-                    전체 총 합계: {calculateTotalSum(itemsInfo)}
+                    전체 총 합계:{" "}
+                    {calculateTotalSum(
+                      itemsInfo.filter((item) =>
+                        selectedItems.includes(item.id)
+                      )
+                    )}
                   </Typography>
                 }
                 secondary={<></>}
