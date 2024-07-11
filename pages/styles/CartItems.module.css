@@ -62,10 +62,21 @@
   text-align: right; /* 전체 총 합계를 오른쪽 정렬 */
   color: #333;
 }
-
 .box-list button {
-  background-color: black; /* 배경색을 블랙으로 지정 */
-  color: white;
+  background-color: black;
+}
+.box-list button:hover {
+  background-color: black; /* 원래의 배경색 */
+  color: white; /* 원래의 텍스트 색상 */
+}
+.box-list .kakaopay-button {
+  background-color: rgb(255, 255, 255);
+  width: 8em; /* 원하는 너비로 지정 */
+  height: 5em; /* 원하는 높이로 지정 */
+  background-position: center center; /* 이미지를 가운데 정렬 */
+}
+.box-list .kakaopay-button:hover {
+  background-color: white; /* 원래의 배경색 */
 }
 /* 선택취소 버튼을 오른쪽으로 정렬 */
 .cancel-button {

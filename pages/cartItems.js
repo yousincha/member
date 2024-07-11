@@ -8,13 +8,14 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   Checkbox,
   Button,
+  TextField,
 } from "@mui/material";
 import styles from "./styles/CartItems.module.css"; // CSS 모듈 임포트
-import requestPay from "./services/paymentService"; // paymentService.js에서 requestPay import
-import cancelCart from "./services/cancelService"; // cancelService.js에서 cancelCart import
+import requestPay from "./services/paymentService";
+import cancelCart from "./services/cancelService";
+import updateCart from "./services/updateService";
 
 const CartItems = () => {
   const [itemsInfo, setItemsInfo] = useState([]);
@@ -90,7 +91,7 @@ const CartItems = () => {
         calculateTotalSum,
         calculateTotalPrice
       );
-      alert(result); // 성공 메시지 출력
+      alert(result);
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.filter((item) => !selectedItems.includes(item.id))
       ); // 결제된 상품들을 카트에서 제거
@@ -103,13 +104,27 @@ const CartItems = () => {
   const handleCancel = async (itemId) => {
     try {
       const result = await cancelCart(loginInfo, [itemId]);
-      alert(result); // 성공 메시지 출력
+      // alert(result); // 성공 메시지 출력
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.filter((item) => item.id !== itemId)
       ); // 선택 취소된 상품들을 카트에서 제거
       setSelectedItems((prevSelectedItems) =>
         prevSelectedItems.filter((id) => id !== itemId)
       ); // 선택된 상품에서 제거
+    } catch (error) {
+      alert(error); // 실패 메시지 출력
+    }
+  };
+
+  const handleUpdateQuantity = async (itemId, newQuantity) => {
+    try {
+      const result = await updateCart(loginInfo, itemId, newQuantity);
+      // alert(result); // 성공 메시지 출력
+      setItemsInfo((prevItemsInfo) =>
+        prevItemsInfo.map((item) =>
+          item.id === itemId ? { ...item, quantity: newQuantity } : item
+        )
+      ); // 수량이 업데이트된 상품 정보 반영
     } catch (error) {
       alert(error); // 실패 메시지 출력
     }
@@ -153,7 +168,7 @@ const CartItems = () => {
                     </Typography>
                   }
                   secondary={
-                    <>
+                    <div>
                       <Typography
                         className={styles["item-description"]}
                         component="span"
@@ -165,8 +180,24 @@ const CartItems = () => {
                         className={styles["item-price"]}
                         component="span"
                       >
-                        가격: {item.productPrice} | 수량: {item.quantity}
+                        가격: {item.productPrice} | 수량:{" "}
                       </Typography>
+                      <TextField
+                        type="number"
+                        defaultValue={item.quantity}
+                        onBlur={(e) =>
+                          handleUpdateQuantity(item.id, e.target.value)
+                        }
+                        className={styles["quantity-input"]}
+                        inputProps={{ min: 1 }}
+                        sx={{
+                          "& .MuiInputBase-input": {
+                            padding: "5px 8px",
+                            height: "1em",
+                            width: "2em",
+                          },
+                        }}
+                      />
                       <br />
                       <Typography
                         className={styles["item-total"]}
@@ -184,7 +215,7 @@ const CartItems = () => {
                       >
                         선택취소
                       </Button>
-                    </>
+                    </div>
                   }
                 />
               </ListItem>
@@ -205,14 +236,21 @@ const CartItems = () => {
                 secondary={<></>}
               />
             </ListItem>
-            <ListItem className={styles["box-list"]}>
+            <ListItem className={`${styles["box-list"]}`}>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleCheckout}
-                fullWidth
+                className={styles["kakaopay-button"]}
+                style={{
+                  backgroundImage: `url('/kakaopay.png')`,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  textIndent: "-9999px",
+                  backgroundOrigin: "content-box",
+                }}
               >
-                결제하기
+                카카오페이 간편결제
               </Button>
             </ListItem>
           </List>
