@@ -5,10 +5,10 @@ const cancelCart = async (loginInfo, selectedItems) => {
     const response = await axios.delete(
       "http://localhost:8080/cartItems/cancelCartItems",
       {
-        data: { itemIds: selectedItems },
         headers: {
           Authorization: `Bearer ${loginInfo.accessToken}`,
         },
+        params: { itemIds: selectedItems.join() }, // 배열을 문자열로 변환하여 전달
       }
     );
 
@@ -18,7 +18,7 @@ const cancelCart = async (loginInfo, selectedItems) => {
       throw new Error("상품 삭제에 실패했습니다.");
     }
   } catch (error) {
-    console.error("Error while deleting items from cart:", error);
+    console.error("장바구니 상품 삭제 중 오류 발생:", error);
     throw new Error("상품 삭제 중 오류가 발생했습니다.");
   }
 };

@@ -8,6 +8,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemSecondaryAction,
   Checkbox,
   Button,
 } from "@mui/material";
@@ -105,7 +106,7 @@ const CartItems = () => {
       alert(result); // 성공 메시지 출력
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.filter((item) => item.id !== itemId)
-      ); // 삭제된 상품들을 카트에서 제거
+      ); // 선택 취소된 상품들을 카트에서 제거
       setSelectedItems((prevSelectedItems) =>
         prevSelectedItems.filter((id) => id !== itemId)
       ); // 선택된 상품에서 제거
@@ -179,8 +180,9 @@ const CartItems = () => {
                         variant="contained"
                         color="secondary"
                         onClick={() => handleCancel(item.id)}
+                        className={styles["cancel-button"]}
                       >
-                        삭제하기
+                        선택취소
                       </Button>
                     </>
                   }

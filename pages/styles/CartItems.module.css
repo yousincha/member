@@ -54,6 +54,7 @@
   text-align: right; /* 총 금액을 오른쪽 정렬 */
   color: #333;
   display: block;
+  margin-top: 20px; /* 간격을 조절하는 부분 */
 }
 
 .box-list .item-totalprice {
@@ -65,4 +66,8 @@
 .box-list button {
   background-color: black; /* 배경색을 블랙으로 지정 */
   color: white;
+}
+/* 선택취소 버튼을 오른쪽으로 정렬 */
+.cancel-button {
+  float: right;
 }
