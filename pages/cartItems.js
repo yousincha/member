@@ -74,7 +74,7 @@ const CartItems = () => {
     });
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (pg) => {
     const selectedItemsInfo = itemsInfo.filter((item) =>
       selectedItems.includes(item.id)
     );
@@ -89,7 +89,8 @@ const CartItems = () => {
         loginInfo,
         selectedItemsInfo,
         calculateTotalSum,
-        calculateTotalPrice
+        calculateTotalPrice,
+        pg
       );
       alert(result);
       setItemsInfo((prevItemsInfo) =>
@@ -236,21 +237,56 @@ const CartItems = () => {
                 secondary={<></>}
               />
             </ListItem>
-            <ListItem className={`${styles["box-list"]}`}>
+            <ListItemText
+              primary="결제수단"
+              primaryTypographyProps={{
+                style: {
+                  fontWeight: "bold",
+                  fontSize: "1.2em",
+                  marginLeft: "3em",
+                  marginTop: "3em",
+                },
+              }}
+            />
+
+            <ListItem
+              className={`${styles["box-list"]}`}
+              style={{ display: "flex", justifyContent: "center" }}
+            >
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleCheckout}
-                className={styles["kakaopay-button"]}
+                onClick={() => handleCheckout("html5_inicis.INIBillTst")}
+                className={styles["card-payment-button"]}
+              >
+                신용 · 체크카드
+              </Button>
+            </ListItem>
+            <ListItem
+              className={`${styles["box-list"]}`}
+              style={{ display: "flex", justifyContent: "center" }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleCheckout("kakaopay.TC0ONETIME")}
+                className={styles["pay-button"]}
                 style={{
                   backgroundImage: `url('/kakaopay.png')`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  textIndent: "-9999px",
-                  backgroundOrigin: "content-box",
                 }}
               >
                 카카오페이 간편결제
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleCheckout("tosspay.tosstest")}
+                className={styles["pay-button"]}
+                style={{
+                  backgroundImage: `url('/toss.png')`,
+                }}
+              >
+                토스페이 간편결제
               </Button>
             </ListItem>
           </List>

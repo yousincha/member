@@ -4,7 +4,8 @@ const requestPay = async (
   loginInfo,
   itemsInfo,
   calculateTotalSum,
-  calculateTotalPrice
+  calculateTotalPrice,
+  pg
 ) => {
   const { IMP } = window;
   IMP.init("imp07380687");
@@ -13,7 +14,7 @@ const requestPay = async (
   return new Promise((resolve, reject) => {
     IMP.request_pay(
       {
-        pg: "kakaopay.TC0ONETIME",
+        pg: pg, // 동적으로 pg 값 설정
         pay_method: "card",
         merchant_uid: new Date().getTime(),
         name: "테스트 상품",
