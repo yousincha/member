@@ -127,7 +127,8 @@ const JoinForm = () => {
             <InputLabel>성별</InputLabel>
             <Select value={gender} onChange={handleChange} label="성별">
               <MenuItem value="M">남성</MenuItem>
-              <MenuItem value="F">여성</MenuItem>
+              <MenuItem value="F">여성</MenuItem>{" "}
+              <MenuItem value="E">기타</MenuItem>
             </Select>
           </FormControl>
           <SignupButton

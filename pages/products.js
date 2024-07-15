@@ -217,6 +217,9 @@ const ProductList = ({
       return 0;
     }
   });
+  const formatPrice = (price) => {
+    return price.toLocaleString(); // 숫자를 문자열로 변환하면서 세 자리마다 쉼표를 추가
+  };
 
   // 정렬 기준 버튼 텍스트를 동적으로 설정합니다.
   const getSortButtonText = () => {
@@ -308,8 +311,9 @@ const ProductList = ({
                         {product.title}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {product.price}원
+                        {formatPrice(product.price)}원{" "}
                       </Typography>
+
                       <Typography variant="body2" color="text.secondary">
                         {cartItem
                           ? `장바구니 담긴 수량: ${cartItem.quantity}`
