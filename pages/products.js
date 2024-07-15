@@ -9,6 +9,8 @@ import {
   CardActions,
   Button,
   Box,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import Link from "next/link";
 import axios from "axios";
@@ -27,10 +29,34 @@ const useStyles = {
     paddingTop: "150%",
   },
   gridContainer: {
-    justifyContent: "center",
+    justifyContent: "left",
+  },
+  categoryButton: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: "20px",
+    fontWeight: "bold",
+    width: "100px",
+    marginBottom: 24,
+    color: "#333",
+    "&:hover": {
+      backgroundColor: "#d0d0d0",
+    },
+  },
+  sortContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between", // 정렬 기준 버튼과 총 상품 수량을 양 옆에 정렬
+    marginBottom: 16,
+  },
+  sortButton: {
+    height: "auto",
+    padding: "8px 16px", // Adjust padding as needed
+    fontSize: "1rem", // Adjust font size as needed
+  },
+  totalProductsText: {
+    fontSize: "1rem", // Match font size with button for alignment
   },
 };
-
 const ProductList = ({
   categories,
   products,
@@ -40,6 +66,9 @@ const ProductList = ({
 }) => {
   const [cartItems, setCartItems] = useState([]);
   const [memberId, setMemberId] = useState("");
+  const [sortAnchorEl, setSortAnchorEl] = useState(null);
+  const [sortOption, setSortOption] = useState("default"); // 초기 값은 "default"로 설정
+  const [totalProducts, setTotalProducts] = useState(0);
 
   useEffect(() => {
     const fetchCartData = async () => {
@@ -72,6 +101,10 @@ const ProductList = ({
 
     fetchCartData();
   }, []);
+
+  useEffect(() => {
+    setTotalProducts(products.length);
+  }, [products]);
 
   const handleAddToCart = async (product) => {
     const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
@@ -114,7 +147,6 @@ const ProductList = ({
         quantity: 1,
       };
 
-      // 업데이트 된 상태를 먼저 반영
       setCartItems((prevCartItems) => {
         const existingCartItem = prevCartItems.find(
           (item) => item.productId === product.id
@@ -161,27 +193,104 @@ const ProductList = ({
     }
   };
 
+  const handleSortClick = (event) => {
+    setSortAnchorEl(event.currentTarget);
+  };
+
+  const handleSortClose = () => {
+    setSortAnchorEl(null);
+  };
+
+  const handleSortOption = (option) => {
+    setSortOption(option);
+    handleSortClose();
+  };
+
+  const sortedProducts = [...products].sort((a, b) => {
+    if (sortOption === "priceHighToLow") {
+      return b.price - a.price;
+    } else if (sortOption === "priceLowToHigh") {
+      return a.price - b.price;
+    } else if (sortOption === "name") {
+      return a.title.localeCompare(b.title);
+    } else {
+      return 0;
+    }
+  });
+
+  // 정렬 기준 버튼 텍스트를 동적으로 설정합니다.
+  const getSortButtonText = () => {
+    if (sortOption === "priceHighToLow") {
+      return "가격 높은 순";
+    } else if (sortOption === "priceLowToHigh") {
+      return "가격 낮은 순";
+    } else if (sortOption === "name") {
+      return "이름 순";
+    } else {
+      return "정렬 기준";
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Container style={useStyles.container}>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           <Grid item>
             <Link href={`/products`} passHref>
-              <Button>모두</Button>
+              <Button style={useStyles.categoryButton}>모두</Button>
             </Link>
           </Grid>
           {categories.map((category) => (
             <Grid item key={category.id}>
               <Link href={`/products?categoryId=${category.id}`} passHref>
-                <Button>{category.name}</Button>
+                <Button style={useStyles.categoryButton}>
+                  {category.name}
+                </Button>
               </Link>
             </Grid>
           ))}
         </Grid>
 
+        <Box style={useStyles.sortContainer} marginBottom={2}>
+          <Typography
+            variant="body1"
+            component="div"
+            style={useStyles.totalProductsText}
+          >
+            총 상품 수량: {totalProducts}
+          </Typography>
+          <Box>
+            <Button
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleSortClick}
+              style={useStyles.sortButton}
+            >
+              {getSortButtonText()} {/* 동적으로 표시될 버튼 텍스트 */}
+            </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={sortAnchorEl}
+              keepMounted
+              open={Boolean(sortAnchorEl)}
+              onClose={handleSortClose}
+            >
+              <MenuItem onClick={() => handleSortOption("priceHighToLow")}>
+                가격 높은 순
+              </MenuItem>
+              <MenuItem onClick={() => handleSortOption("priceLowToHigh")}>
+                가격 낮은 순
+              </MenuItem>
+              <MenuItem onClick={() => handleSortOption("name")}>
+                이름 순
+              </MenuItem>
+            </Menu>
+          </Box>
+        </Box>
+
         <Grid container spacing={3} style={useStyles.gridContainer}>
-          {products.length > 0 ? (
-            products.map((product, index) => {
+          {sortedProducts.length > 0 ? (
+            sortedProducts.map((product, index) => {
               const cartItem = cartItems.find(
                 (item) => item.productId === product.id
               );

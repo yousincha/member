@@ -251,21 +251,20 @@ const CartItems = () => {
 
             <ListItem
               className={`${styles["box-list"]}`}
-              style={{ display: "flex", justifyContent: "center" }}
+              style={{
+                display: "flex",
+                justifyContent: "left",
+                paddingLeft: "3em",
+              }}
             >
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => handleCheckout("html5_inicis.INIBillTst")}
-                className={styles["card-payment-button"]}
+                className={styles["cardpay-button"]}
               >
                 신용 · 체크카드
               </Button>
-            </ListItem>
-            <ListItem
-              className={`${styles["box-list"]}`}
-              style={{ display: "flex", justifyContent: "center" }}
-            >
               <Button
                 variant="contained"
                 color="primary"
