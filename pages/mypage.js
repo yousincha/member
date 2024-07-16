@@ -137,14 +137,20 @@ const MyPage = () => {
               </tr>
             </tbody>
           </table>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setIsEditing(true)}
-            fullWidth
-          >
-            수정하기
-          </Button>
+          <div className={styles.buttonContainer}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setIsEditing(true)}
+              sx={{
+                bgcolor: "black",
+                color: "white",
+                "&:hover": { bgcolor: "black" },
+              }}
+            >
+              수정하기
+            </Button>
+          </div>
         </div>
       ) : (
         <div className={styles["form-container"]}>
@@ -200,15 +206,21 @@ const MyPage = () => {
             <MenuItem value="M">남자</MenuItem>
             <MenuItem value="F">여자</MenuItem>
             <MenuItem value="E">기타</MenuItem>
-          </TextField>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSave}
-            fullWidth
-          >
-            저장
-          </Button>
+          </TextField>{" "}
+          <div className={styles.buttonContainer}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSave}
+              sx={{
+                bgcolor: "black",
+                color: "white",
+                "&:hover": { bgcolor: "black" },
+              }}
+            >
+              저장
+            </Button>
+          </div>
         </div>
       )}
     </Container>

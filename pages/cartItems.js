@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/router";
 import {
   Container,
   Typography,
@@ -11,7 +12,7 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import styles from "./styles/CartItems.module.css";
+import styles from "./styles/CartItems.module.css"; // CSS 모듈 임포트
 import cancelCart from "./services/cancelService";
 import updateCart from "./services/updateService";
 import DeliveryInfo from "./api/delivery"; // delivery.js 파일을 import
@@ -19,10 +20,8 @@ import PayInfo from "./api/pay"; // pay.js 파일을 import
 
 const CartItems = () => {
   const [itemsInfo, setItemsInfo] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]); // 선택된 아이템들 상태
   const [loginInfo, setLoginInfo] = useState(null);
-
-  // 배송 정보 state
   const [postalCode, setPostalCode] = useState("");
   const [address, setAddress] = useState("");
   const [recipientName, setRecipientName] = useState("");
@@ -31,6 +30,7 @@ const CartItems = () => {
     part2: "",
     part3: "",
   });
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -59,6 +59,19 @@ const CartItems = () => {
     fetchUserInfo();
   }, []);
 
+  useEffect(() => {
+    const jquery = document.createElement("script");
+    jquery.src = "http://code.jquery.com/jquery-1.12.4.min.js";
+    const iamport = document.createElement("script");
+    iamport.src = "http://cdn.iamport.kr/js/iamport.payment-1.1.7.js";
+    document.head.appendChild(jquery);
+    document.head.appendChild(iamport);
+    return () => {
+      document.head.removeChild(jquery);
+      document.head.removeChild(iamport);
+    };
+  }, []);
+
   const handleItemCheck = (itemId) => {
     setSelectedItems((prevSelectedItems) => {
       if (prevSelectedItems.includes(itemId)) {
@@ -72,27 +85,29 @@ const CartItems = () => {
   const handleCancel = async (itemId) => {
     try {
       const result = await cancelCart(loginInfo, [itemId]);
+      // alert(result); // 성공 메시지 출력
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.filter((item) => item.id !== itemId)
-      );
+      ); // 선택 취소된 상품들을 카트에서 제거
       setSelectedItems((prevSelectedItems) =>
         prevSelectedItems.filter((id) => id !== itemId)
-      );
+      ); // 선택된 상품에서 제거
     } catch (error) {
-      alert(error);
+      alert(error); // 실패 메시지 출력
     }
   };
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     try {
       const result = await updateCart(loginInfo, itemId, newQuantity);
+      // alert(result); // 성공 메시지 출력
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.map((item) =>
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         )
-      );
+      ); // 수량이 업데이트된 상품 정보 반영
     } catch (error) {
-      alert(error);
+      alert(error); // 실패 메시지 출력
     }
   };
 
@@ -101,6 +116,12 @@ const CartItems = () => {
     items.forEach((item) => {
       totalSum += calculateTotalPrice(item.productPrice, item.quantity);
     });
+
+    // 총합이 3만원 이하인 경우 배송비 3000원 추가
+    if (totalSum <= 30000) {
+      totalSum += 3000;
+    }
+
     return totalSum;
   };
 
@@ -199,11 +220,27 @@ const CartItems = () => {
                     )}
                   </Typography>
                 }
-                secondary={<></>}
+                secondary={
+                  <Typography variant="body2" component="span">
+                    {calculateTotalSum(
+                      itemsInfo.filter((item) =>
+                        selectedItems.includes(item.id)
+                      )
+                    ) <= 30000
+                      ? "(+배송비: 3,000원)"
+                      : "(+무료배송(0원))"}
+                  </Typography>
+                }
               />
             </ListItem>
             <DeliveryInfo
               loginInfo={loginInfo}
+              itemsInfo={itemsInfo}
+              selectedItems={selectedItems}
+              calculateTotalSum={calculateTotalSum}
+              calculateTotalPrice={calculateTotalPrice}
+              setItemsInfo={setItemsInfo}
+              setSelectedItems={setSelectedItems}
               postalCode={postalCode}
               setPostalCode={setPostalCode}
               address={address}
