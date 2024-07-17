@@ -1,7 +1,9 @@
-import React, { useRef } from "react";
+// DeliveryInfo.jsx
+
+import React, { useEffect, useRef, useState } from "react";
 import { List, ListItem, TextField, Button, ListItemText } from "@mui/material";
-import addressInfo from "../services/addressService";
 import axios from "axios";
+import addressInfo from "../services/addressService"; // addressInfo 함수를 import
 
 const DeliveryInfo = ({
   loginInfo,
@@ -16,12 +18,31 @@ const DeliveryInfo = ({
 }) => {
   const phonePart2Ref = useRef(null);
   const phonePart3Ref = useRef(null);
+  const [addressList, setAddressList] = useState([]);
+
+  useEffect(() => {
+    const fetchAddressList = async () => {
+      if (!loginInfo) return;
+      try {
+        const response = await axios.get("http://localhost:8080/addresses", {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        });
+        setAddressList(response.data);
+      } catch (error) {
+        console.error("주소 목록을 가져오는데 실패했습니다.", error);
+      }
+    };
+    fetchAddressList();
+  }, [loginInfo]);
 
   const handleAddressChange = async () => {
     try {
-      const { postalCode, address } = await addressInfo();
-      setPostalCode(postalCode);
-      setAddress(address);
+      const { postalCode: newPostalCode, address: newAddress } =
+        await addressInfo(); // addressInfo 함수로부터 postalCode와 address를 가져옴
+      setPostalCode(newPostalCode); // 가져온 postalCode를 state에 설정
+      setAddress(newAddress); // 가져온 address를 state에 설정
     } catch (error) {
       console.error("주소를 가져오는데 실패했습니다.", error);
     }
@@ -34,7 +55,7 @@ const DeliveryInfo = ({
         part1: value.replace(/[^0-9]/g, "").slice(0, 3),
       }));
       if (value.length === 3) {
-        phonePart2Ref.current.focus(); // phonePart1 입력이 끝나면 phonePart2로 포커스 이동
+        phonePart2Ref.current.focus();
       }
     } else if (part === 2) {
       setRecipientPhone((prevPhone) => ({
@@ -42,7 +63,7 @@ const DeliveryInfo = ({
         part2: value.replace(/[^0-9]/g, "").slice(0, 4),
       }));
       if (value.length === 4) {
-        phonePart3Ref.current.focus(); // phonePart2 입력이 끝나면 phonePart3로 포커스 이동
+        phonePart3Ref.current.focus();
       }
     } else if (part === 3) {
       setRecipientPhone((prevPhone) => ({
@@ -78,7 +99,7 @@ const DeliveryInfo = ({
       };
 
       const response = await axios.post(
-        "http://localhost:8080/saveAddress",
+        "http://localhost:8080/addresses",
         addressData,
         {
           headers: {
@@ -88,10 +109,31 @@ const DeliveryInfo = ({
       );
 
       alert("주소가 저장되었습니다.");
+      const updatedAddressList = await axios.get(
+        "http://localhost:8080/addresses",
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        }
+      );
+      setAddressList(updatedAddressList.data);
     } catch (error) {
       console.error("주소 저장 실패:", error);
       alert("주소 저장에 실패했습니다.");
     }
+  };
+
+  const handleAddressButtonClick = (address) => {
+    setPostalCode(address.postalCode);
+    setAddress(address.address);
+    setRecipientName(address.recipientName);
+    const phoneParts = address.recipientPhone.split("-");
+    setRecipientPhone({
+      part1: phoneParts[0] || "",
+      part2: phoneParts[1] || "",
+      part3: phoneParts[2] || "",
+    });
   };
 
   return (
@@ -106,6 +148,19 @@ const DeliveryInfo = ({
           },
         }}
       />
+      {addressList.map((address, index) => (
+        <ListItem key={address.id}>
+          {" "}
+          {/* 각 ListItem에 key prop 추가 */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleAddressButtonClick(address)}
+          >
+            주소 {index + 1}
+          </Button>
+        </ListItem>
+      ))}
       <ListItem>
         <TextField
           label="이름"
@@ -146,7 +201,7 @@ const DeliveryInfo = ({
         <Button
           variant="contained"
           color="primary"
-          onClick={handleAddressChange}
+          onClick={handleAddressChange} // 주소 검색 버튼 클릭 시 handleAddressChange 함수 실행
         >
           주소 검색
         </Button>
