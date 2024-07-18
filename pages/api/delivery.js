@@ -1,7 +1,14 @@
-// DeliveryInfo.jsx
-
 import React, { useEffect, useRef, useState } from "react";
-import { List, ListItem, TextField, Button, ListItemText } from "@mui/material";
+import {
+  List,
+  ListItem,
+  TextField,
+  Button,
+  ListItemText,
+  IconButton,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import addressInfo from "../services/addressService"; // addressInfo 함수를 import
 
@@ -19,6 +26,7 @@ const DeliveryInfo = ({
   const phonePart2Ref = useRef(null);
   const phonePart3Ref = useRef(null);
   const [addressList, setAddressList] = useState([]);
+  const [editingAddressId, setEditingAddressId] = useState(null);
 
   useEffect(() => {
     const fetchAddressList = async () => {
@@ -117,10 +125,11 @@ const DeliveryInfo = ({
           },
         }
       );
+
       setAddressList(updatedAddressList.data);
     } catch (error) {
       console.error("주소 저장 실패:", error);
-      alert("주소 저장에 실패했습니다.");
+      alert("주소는 3개까지만 등록 가능합니다.");
     }
   };
 
@@ -134,10 +143,92 @@ const DeliveryInfo = ({
       part2: phoneParts[1] || "",
       part3: phoneParts[2] || "",
     });
+    setEditingAddressId(address.id);
+  };
+
+  const handleEditAddress = async () => {
+    if (!loginInfo) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    if (
+      !postalCode ||
+      !address ||
+      !recipientName ||
+      !recipientPhone.part1 ||
+      !recipientPhone.part2 ||
+      !recipientPhone.part3
+    ) {
+      alert("모든 배송 정보를 입력하세요.");
+      return;
+    }
+    try {
+      const updatedData = {
+        recipientName,
+        recipientPhone: `${recipientPhone.part1}-${recipientPhone.part2}-${recipientPhone.part3}`,
+        postalCode,
+        address,
+      };
+
+      const response = await axios.put(
+        `http://localhost:8080/addresses/${editingAddressId}`,
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        }
+      );
+
+      alert("주소가 업데이트 되었습니다.");
+      const updatedAddressList = await axios.get(
+        "http://localhost:8080/addresses",
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        }
+      );
+
+      setAddressList(updatedAddressList.data);
+    } catch (error) {
+      console.error("주소 업데이트 실패:", error);
+      alert("주소를 업데이트하는 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:8080/addresses/${addressId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        }
+      );
+      alert("주소가 삭제되었습니다.");
+
+      const updatedAddressList = await axios.get(
+        "http://localhost:8080/addresses",
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        }
+      );
+      setAddressList(updatedAddressList.data);
+    } catch (error) {
+      console.error("주소 삭제 실패:", error);
+      alert("주소를 삭제하는 중 오류가 발생했습니다.");
+    }
   };
 
   return (
-    <List className="delivery_info" style={{ paddingLeft: "3em" }}>
+    <List
+      className="delivery_info"
+      style={{ paddingLeft: "3em", display: "flex", flexWrap: "wrap" }}
+    >
       <ListItemText
         primary="배송지 입력"
         primaryTypographyProps={{
@@ -148,18 +239,33 @@ const DeliveryInfo = ({
           },
         }}
       />
+
       {addressList.map((address, index) => (
-        <ListItem key={address.id}>
-          {" "}
-          {/* 각 ListItem에 key prop 추가 */}
+        <div key={address.id} style={{ display: "flex", alignItems: "center" }}>
           <Button
             variant="contained"
             color="primary"
             onClick={() => handleAddressButtonClick(address)}
+            style={{
+              margin: "0.5em",
+              whiteSpace: "nowrap",
+            }}
           >
             주소 {index + 1}
           </Button>
-        </ListItem>
+          <IconButton
+            aria-label="edit"
+            onClick={() => handleAddressButtonClick(address.id)}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            aria-label="delete"
+            onClick={() => handleDeleteAddress(address.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </div>
       ))}
       <ListItem>
         <TextField
@@ -201,7 +307,7 @@ const DeliveryInfo = ({
         <Button
           variant="contained"
           color="primary"
-          onClick={handleAddressChange} // 주소 검색 버튼 클릭 시 handleAddressChange 함수 실행
+          onClick={handleAddressChange}
         >
           주소 검색
         </Button>
@@ -215,8 +321,12 @@ const DeliveryInfo = ({
         />
       </ListItem>
       <ListItem>
-        <Button variant="contained" color="primary" onClick={onSaveAddress}>
-          주소 저장
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={editingAddressId ? handleEditAddress : onSaveAddress}
+        >
+          {editingAddressId ? "주소 수정" : "주소 저장"}
         </Button>
       </ListItem>
     </List>

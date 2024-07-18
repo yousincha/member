@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, TextField, Button, MenuItem } from "@mui/material";
+import {
+  Container,
+  TextField,
+  Button,
+  MenuItem,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 import styles from "./styles/MyPage.module.css";
 
 const MyPage = () => {
@@ -15,6 +23,8 @@ const MyPage = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false); // State to track save success
+  const [addressList, setAddressList] = useState([]);
+  const [editAddressIndex, setEditAddressIndex] = useState(-1); // Index of the address being edited
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -44,6 +54,18 @@ const MyPage = () => {
           birthDay: response.data.birthDay,
           gender: response.data.gender,
         });
+
+        // Fetch address list
+        const addressResponse = await axios.get(
+          "http://localhost:8080/addresses",
+          {
+            headers: {
+              Authorization: `Bearer ${loginInfo.accessToken}`,
+            },
+          }
+        );
+
+        setAddressList(addressResponse.data);
       } catch (error) {
         console.error("회원 정보를 가져오는 중 오류가 발생했습니다.", error);
         window.location.href = "/login";
@@ -89,6 +111,45 @@ const MyPage = () => {
     } catch (error) {
       console.error("회원 정보를 업데이트하는 중 오류가 발생했습니다.", error);
       alert("회원 정보를 업데이트하는 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleEditAddress = (index) => {
+    setEditAddressIndex(index);
+  };
+
+  const handleSaveAddress = async (editedAddress) => {
+    const storedLoginInfo = localStorage.getItem("loginInfo");
+
+    if (!storedLoginInfo) {
+      alert("로그인이 필요합니다.");
+      window.location.href = "/login";
+      return;
+    }
+
+    const loginInfo = JSON.parse(storedLoginInfo);
+
+    try {
+      await axios.put(
+        `http://localhost:8080/addresses/${editedAddress.id}`,
+        { address: editedAddress.address }, // Assuming address is the field being edited
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        }
+      );
+      alert("주소가 성공적으로 업데이트되었습니다.");
+
+      // Update the address list with the edited address
+      const updatedAddressList = [...addressList];
+      updatedAddressList[editAddressIndex] = editedAddress;
+      setAddressList(updatedAddressList);
+
+      setEditAddressIndex(-1); // Reset edit mode
+    } catch (error) {
+      console.error("주소를 업데이트하는 중 오류가 발생했습니다.", error);
+      alert("주소를 업데이트하는 중 오류가 발생했습니다.");
     }
   };
 
