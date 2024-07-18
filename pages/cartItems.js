@@ -12,15 +12,15 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import styles from "./styles/CartItems.module.css"; // CSS 모듈 임포트
+import styles from "./styles/CartItems.module.css";
 import cancelCart from "./services/cancelService";
 import updateCart from "./services/updateService";
-import DeliveryInfo from "./api/delivery"; // delivery.js 파일을 import
-import PayInfo from "./api/pay"; // pay.js 파일을 import
+import DeliveryInfo from "./api/delivery";
+import PayInfo from "./api/pay";
 
 const CartItems = () => {
   const [itemsInfo, setItemsInfo] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]); // 선택된 아이템들 상태
+  const [selectedItems, setSelectedItems] = useState([]);
   const [loginInfo, setLoginInfo] = useState(null);
   const [postalCode, setPostalCode] = useState("");
   const [address, setAddress] = useState("");
@@ -85,29 +85,27 @@ const CartItems = () => {
   const handleCancel = async (itemId) => {
     try {
       const result = await cancelCart(loginInfo, [itemId]);
-      // alert(result); // 성공 메시지 출력
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.filter((item) => item.id !== itemId)
-      ); // 선택 취소된 상품들을 카트에서 제거
+      );
       setSelectedItems((prevSelectedItems) =>
         prevSelectedItems.filter((id) => id !== itemId)
-      ); // 선택된 상품에서 제거
+      );
     } catch (error) {
-      alert(error); // 실패 메시지 출력
+      alert(error);
     }
   };
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     try {
       const result = await updateCart(loginInfo, itemId, newQuantity);
-      // alert(result); // 성공 메시지 출력
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.map((item) =>
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         )
-      ); // 수량이 업데이트된 상품 정보 반영
+      );
     } catch (error) {
-      alert(error); // 실패 메시지 출력
+      alert(error);
     }
   };
 
@@ -117,7 +115,6 @@ const CartItems = () => {
       totalSum += calculateTotalPrice(item.productPrice, item.quantity);
     });
 
-    // 총합이 3만원 이하인 경우 배송비 3000원 추가
     if (totalSum <= 30000) {
       totalSum += 3000;
     }
@@ -128,7 +125,9 @@ const CartItems = () => {
   const calculateTotalPrice = (price, quantity) => {
     return price * quantity;
   };
-
+  const formatPriceWithCommas = (price) => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
   if (!loginInfo) {
     return <div>Loading...</div>;
   }
@@ -167,7 +166,7 @@ const CartItems = () => {
                         className={styles["item-price"]}
                         component="span"
                       >
-                        가격: {item.productPrice} | 수량:{" "}
+                        가격: {formatPriceWithCommas(item.productPrice)} | 수량:{" "}
                       </Typography>
                       <TextField
                         type="number"
@@ -191,7 +190,9 @@ const CartItems = () => {
                         component="span"
                       >
                         + 총 금액:{" "}
-                        {calculateTotalPrice(item.productPrice, item.quantity)}
+                        {formatPriceWithCommas(
+                          calculateTotalPrice(item.productPrice, item.quantity)
+                        )}
                       </Typography>
                       <br />
                       <Button
@@ -213,9 +214,11 @@ const CartItems = () => {
                 primary={
                   <Typography variant="body1" component="span">
                     전체 총 합계:{" "}
-                    {calculateTotalSum(
-                      itemsInfo.filter((item) =>
-                        selectedItems.includes(item.id)
+                    {formatPriceWithCommas(
+                      calculateTotalSum(
+                        itemsInfo.filter((item) =>
+                          selectedItems.includes(item.id)
+                        )
                       )
                     )}
                   </Typography>

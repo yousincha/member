@@ -9,8 +9,10 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import addressInfo from "../services/addressService"; // addressInfo 함수를 import
+import styles from "../styles/Delivery.module.css"; // Import the CSS module
 
 const DeliveryInfo = ({
   loginInfo,
@@ -27,6 +29,7 @@ const DeliveryInfo = ({
   const phonePart3Ref = useRef(null);
   const [addressList, setAddressList] = useState([]);
   const [editingAddressId, setEditingAddressId] = useState(null);
+  const [deletedAddress, setDeletedAddress] = useState(false); // New state for tracking deleted address
 
   useEffect(() => {
     const fetchAddressList = async () => {
@@ -43,7 +46,7 @@ const DeliveryInfo = ({
       }
     };
     fetchAddressList();
-  }, [loginInfo]);
+  }, [loginInfo, deletedAddress]); // Listen to changes in deletedAddress state
 
   const handleAddressChange = async () => {
     try {
@@ -208,71 +211,76 @@ const DeliveryInfo = ({
         }
       );
       alert("주소가 삭제되었습니다.");
-
-      const updatedAddressList = await axios.get(
-        "http://localhost:8080/addresses",
-        {
-          headers: {
-            Authorization: `Bearer ${loginInfo.accessToken}`,
-          },
-        }
-      );
-      setAddressList(updatedAddressList.data);
+      setDeletedAddress(true);
     } catch (error) {
       console.error("주소 삭제 실패:", error);
       alert("주소를 삭제하는 중 오류가 발생했습니다.");
     }
   };
 
+  const handleAddNewAddress = () => {
+    setPostalCode("");
+    setAddress("");
+    setRecipientName("");
+    setRecipientPhone({
+      part1: "",
+      part2: "",
+      part3: "",
+    });
+    setEditingAddressId(null);
+  };
+
+  useEffect(() => {
+    if (deletedAddress) {
+      window.location.reload(); // Reload the page upon successful deletion
+    }
+  }, [deletedAddress]);
+
   return (
-    <List
-      className="delivery_info"
-      style={{ paddingLeft: "3em", display: "flex", flexWrap: "wrap" }}
-    >
+    <List className={styles.delivery_info} style={{ marginLeft: "3em" }}>
       <ListItemText
         primary="배송지 입력"
         primaryTypographyProps={{
-          style: {
-            fontWeight: "bold",
-            fontSize: "1.2em",
-            marginTop: "3em",
-          },
+          className: styles.primaryText,
         }}
       />
-
-      {addressList.map((address, index) => (
-        <div key={address.id} style={{ display: "flex", alignItems: "center" }}>
+      <div className={styles.addressButtonContainer}>
+        {addressList.map((address, index) => (
           <Button
+            key={address.id}
             variant="contained"
             color="primary"
             onClick={() => handleAddressButtonClick(address)}
-            style={{
-              margin: "0.5em",
-              whiteSpace: "nowrap",
-            }}
+            className={styles.addressButton}
           >
             주소 {index + 1}
           </Button>
+        ))}
+        {addressList.length < 3 && (
           <IconButton
-            aria-label="edit"
-            onClick={() => handleAddressButtonClick(address.id)}
+            aria-label="add"
+            onClick={handleAddNewAddress}
+            className={styles.iconButton}
           >
-            <EditIcon />
+            <AddIcon />
           </IconButton>
-          <IconButton
-            aria-label="delete"
-            onClick={() => handleDeleteAddress(address.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </div>
-      ))}
+        )}
+      </div>
       <ListItem>
         <TextField
           label="이름"
           value={recipientName}
           onChange={(e) => setRecipientName(e.target.value)}
-        />
+          sx={{ width: "11em" }}
+          style={{ marginRight: "1em" }}
+        />{" "}
+        <IconButton
+          aria-label="delete"
+          onClick={() => handleDeleteAddress(editingAddressId)}
+          className={styles.iconButton}
+        >
+          <DeleteIcon />
+        </IconButton>
       </ListItem>
       <ListItem>
         <TextField
@@ -280,20 +288,20 @@ const DeliveryInfo = ({
           value={recipientPhone.part1}
           onChange={(e) => handlePhoneChange(1, e.target.value)}
           inputProps={{ maxLength: 3 }}
-          sx={{ width: "5em", marginRight: "0.5em" }}
+          sx={{ width: "5em", marginRight: "1em" }}
         />
         <TextField
           value={recipientPhone.part2}
           onChange={(e) => handlePhoneChange(2, e.target.value)}
           inputProps={{ maxLength: 4 }}
-          sx={{ width: "6em", marginRight: "0.5em" }}
+          sx={{ width: "5em", marginRight: "1em" }}
           inputRef={phonePart2Ref}
         />
         <TextField
           value={recipientPhone.part3}
           onChange={(e) => handlePhoneChange(3, e.target.value)}
           inputProps={{ maxLength: 4 }}
-          sx={{ width: "6em" }}
+          sx={{ width: "5em" }}
           inputRef={phonePart3Ref}
         />
       </ListItem>
@@ -302,14 +310,16 @@ const DeliveryInfo = ({
           label="우편번호"
           value={postalCode}
           onChange={(e) => setPostalCode(e.target.value)}
-          style={{ marginRight: "1em" }}
+          sx={{ width: "11em", marginRight: "1em" }}
         />
         <Button
           variant="contained"
           color="primary"
           onClick={handleAddressChange}
+          className={styles.assignButton}
+          sx={{ width: "6em" }}
         >
-          주소 검색
+          검색
         </Button>
       </ListItem>
       <ListItem>
@@ -317,14 +327,13 @@ const DeliveryInfo = ({
           label="주소"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          sx={{ width: "30em" }}
+          sx={{ width: "30em", marginRight: "1em" }}
         />
-      </ListItem>
-      <ListItem>
         <Button
           variant="contained"
           color="primary"
           onClick={editingAddressId ? handleEditAddress : onSaveAddress}
+          className={styles.assignButton}
         >
           {editingAddressId ? "주소 수정" : "주소 저장"}
         </Button>

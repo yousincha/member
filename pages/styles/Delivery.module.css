@@ -1,0 +1,36 @@
+.delivery_info {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.delivery_info .primaryText {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-top: 3em;
+}
+
+.delivery_info .addressButtonContainer {
+  display: flex;
+  align-items: center;
+}
+
+.delivery_info .addressButton {
+  margin: 0.5em;
+  white-space: nowrap;
+}
+
+.delivery_info .addressButton {
+  background: black;
+}
+.delivery_info .assignButton {
+  height: 4em;
+  background: black;
+}
+.delivery_info button:hover {
+  background: black;
+  color: white;
+}
+.delivery_info .iconButton {
+  background: black; /* Change background color on hover */
+  color: white; /* Change text color on hover if needed */
+}
