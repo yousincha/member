@@ -261,6 +261,7 @@ const CartItems = () => {
               calculateTotalPrice={calculateTotalPrice}
               setItemsInfo={setItemsInfo}
               setSelectedItems={setSelectedItems}
+              setPostalCode={setPostalCode}
               recipientName={recipientName}
               recipientPhone={recipientPhone}
               postalCode={postalCode}

@@ -5,25 +5,29 @@ const requestPay = async (
   itemsInfo,
   calculateTotalSum,
   calculateTotalPrice,
-  pg
+  pg,
+  recipientName,
+  recipientPhone,
+  address,
+  postalCode
 ) => {
   const { IMP } = window;
   IMP.init("imp07380687");
   const totalPrice = calculateTotalSum(itemsInfo);
-
+  const buyerTel = `${recipientPhone.part1}-${recipientPhone.part2}-${recipientPhone.part3}`;
+  const productName = `${itemsInfo[0].productDescription}`;
   return new Promise((resolve, reject) => {
     IMP.request_pay(
       {
-        pg: pg, // 동적으로 pg 값 설정
+        pg: pg,
         pay_method: "card",
         merchant_uid: new Date().getTime(),
-        name: "테스트 상품",
+        name: productName,
         amount: totalPrice,
-        buyer_email: "test@gmail.com",
-        buyer_name: "cozy",
-        buyer_tel: "010-1234-5678",
-        buyer_addr: "서울특별시",
-        buyer_postcode: "123-456",
+        buyer_name: recipientName,
+        buyer_tel: buyerTel,
+        buyer_addr: address,
+        buyer_postcode: postalCode,
       },
       async (rsp) => {
         if (rsp.success) {
