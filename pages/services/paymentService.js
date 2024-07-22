@@ -15,7 +15,10 @@ const requestPay = async (
   IMP.init("imp07380687");
   const totalPrice = calculateTotalSum(itemsInfo);
   const buyerTel = `${recipientPhone.part1}-${recipientPhone.part2}-${recipientPhone.part3}`;
-  const productName = `${itemsInfo[0].productDescription}`;
+  const productName = itemsInfo
+    .map((item) => item.productDescription)
+    .join(", ");
+
   return new Promise((resolve, reject) => {
     IMP.request_pay(
       {
