@@ -45,30 +45,34 @@ const MyPage = () => {
           },
         });
 
-        setUserInfo(response.data);
+        const userData = response.data;
+        setUserInfo(userData);
         setEditInfo({
-          name: response.data.name,
-          email: response.data.email,
-          birthYear: response.data.birthYear,
-          birthMonth: response.data.birthMonth,
-          birthDay: response.data.birthDay,
-          gender: response.data.gender,
+          name: userData.name,
+          email: userData.email,
+          birthYear: userData.birthYear,
+          birthMonth: userData.birthMonth,
+          birthDay: userData.birthDay,
+          gender: userData.gender,
         });
 
-        // Fetch address list
         const addressResponse = await axios.get(
-          "http://localhost:8080/addresses",
+          `http://localhost:8080/addresses/${userData.memberId}`,
           {
             headers: {
               Authorization: `Bearer ${loginInfo.accessToken}`,
             },
           }
         );
-
         setAddressList(addressResponse.data);
       } catch (error) {
         console.error("회원 정보를 가져오는 중 오류가 발생했습니다.", error);
-        window.location.href = "/login";
+        if (error.response && error.response.status === 401) {
+          // 토큰이 만료되거나 유효하지 않은 경우
+          alert("로그인이 필요합니다.");
+          localStorage.removeItem("loginInfo");
+          window.location.href = "/login";
+        }
       }
     };
 
@@ -153,6 +157,36 @@ const MyPage = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const storedLoginInfo = localStorage.getItem("loginInfo");
+
+    if (!storedLoginInfo) {
+      alert("로그인이 필요합니다.");
+      window.location.href = "/login";
+      return;
+    }
+
+    const loginInfo = JSON.parse(storedLoginInfo);
+
+    try {
+      await axios.delete(
+        `http://localhost:8080/members/delete/${userInfo.memberId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${loginInfo.accessToken}`,
+          },
+        }
+      );
+      console.log(userInfo);
+      alert("회원 탈퇴가 성공적으로 처리되었습니다.");
+      localStorage.removeItem("loginInfo");
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("회원 탈퇴 중 오류가 발생했습니다.", error);
+      alert("회원 탈퇴 중 오류가 발생했습니다.");
+    }
+  };
+
   useEffect(() => {
     if (saveSuccess) {
       // Refresh the page once after save success
@@ -210,6 +244,19 @@ const MyPage = () => {
               }}
             >
               수정하기
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleDeleteAccount}
+              sx={{
+                bgcolor: "red",
+                color: "white",
+                "&:hover": { bgcolor: "darkred" },
+                marginLeft: "10px",
+              }}
+            >
+              회원탈퇴하기
             </Button>
           </div>
         </div>

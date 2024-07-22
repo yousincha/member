@@ -35,11 +35,14 @@ const DeliveryInfo = ({
     const fetchAddressList = async () => {
       if (!loginInfo) return;
       try {
-        const response = await axios.get("http://localhost:8080/addresses", {
-          headers: {
-            Authorization: `Bearer ${loginInfo.accessToken}`,
-          },
-        });
+        const response = await axios.get(
+          `http://localhost:8080/addresses/${loginInfo.memberId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${loginInfo.accessToken}`,
+            },
+          }
+        );
         setAddressList(response.data);
       } catch (error) {
         console.error("주소 목록을 가져오는데 실패했습니다.", error);
@@ -121,7 +124,7 @@ const DeliveryInfo = ({
 
       alert("주소가 저장되었습니다.");
       const updatedAddressList = await axios.get(
-        "http://localhost:8080/addresses",
+        `http://localhost:8080/addresses/${loginInfo.memberId}`,
         {
           headers: {
             Authorization: `Bearer ${loginInfo.accessToken}`,
@@ -185,7 +188,7 @@ const DeliveryInfo = ({
 
       alert("주소가 업데이트 되었습니다.");
       const updatedAddressList = await axios.get(
-        "http://localhost:8080/addresses",
+        `http://localhost:8080/addresses/${loginInfo.memberId}`,
         {
           headers: {
             Authorization: `Bearer ${loginInfo.accessToken}`,
