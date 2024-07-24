@@ -58,7 +58,7 @@ const JoinForm = () => {
         adminSignupDto
       );
       if (response.status === 200 || response.status == 201) {
-        router.push("/welcome");
+        router.push("/adminlogin");
       }
     } catch (error) {
       console.error(error);

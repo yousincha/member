@@ -51,13 +51,12 @@ const AdminLogin = () => {
       });
 
       if (response.status === 200) {
-        const loginInfo = response.data;
-        localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+        const { accessToken, refreshToken, memberId } = response.data;
+        // JWT와 기타 필요한 정보를 로컬 스토리지에 저장
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("adminId", memberId);
         router.push("/admins/dashboard");
-
-        // 로그인 상태 변경 이벤트 발생
-        const event = new Event("loginStatusChanged");
-        window.dispatchEvent(event);
       }
     } catch (error) {
       console.error(error);
@@ -97,7 +96,7 @@ const AdminLogin = () => {
         <LoginButton type="submit" variant="contained" size="large" fullWidth>
           로그인
         </LoginButton>
-        <Link href="/adminjoinform" passHref>
+        <Link href="/admins/joinform" passHref>
           <LinkButton>회원가입</LinkButton>
         </Link>
       </StyledForm>
