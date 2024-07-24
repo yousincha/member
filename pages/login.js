@@ -53,6 +53,7 @@ const Login = () => {
       if (response.status === 200) {
         const loginInfo = response.data;
         localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+
         router.push("/");
 
         // 로그인 상태 변경 이벤트 발생

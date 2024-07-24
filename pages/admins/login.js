@@ -51,11 +51,11 @@ const AdminLogin = () => {
       });
 
       if (response.status === 200) {
-        const { accessToken, refreshToken, memberId } = response.data;
+        const { accessToken, refreshToken } = response.data;
         // JWT와 기타 필요한 정보를 로컬 스토리지에 저장
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("adminId", memberId);
+
         router.push("/admins/dashboard");
       }
     } catch (error) {
