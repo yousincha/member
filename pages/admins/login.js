@@ -51,12 +51,14 @@ const AdminLogin = () => {
       });
 
       if (response.status === 200) {
-        const { accessToken, refreshToken } = response.data;
-        // JWT와 기타 필요한 정보를 로컬 스토리지에 저장
+        const { accessToken, refreshToken } = response.data; // 역할 정보 추출
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("role", "admin"); // 역할을 "admin"으로 설정
 
-        router.push("/admins/dashboard");
+        router.push("/admins/dashboard").then(() => {
+          window.location.reload();
+        });
       }
     } catch (error) {
       console.error(error);

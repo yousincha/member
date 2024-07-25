@@ -54,11 +54,11 @@ const Login = () => {
         const loginInfo = response.data;
         localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
 
-        router.push("/");
-
         // 로그인 상태 변경 이벤트 발생
-        const event = new Event("loginStatusChanged");
-        window.dispatchEvent(event);
+        const loginEvent = new Event("loginStatusChanged");
+        window.dispatchEvent(loginEvent);
+
+        router.push("/");
       }
     } catch (error) {
       console.error(error);
