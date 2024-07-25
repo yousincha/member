@@ -83,32 +83,32 @@ const Dashboard = () => {
           관리자 대시보드
         </Typography>
         <Box sx={{ marginTop: 4 }}>
-          <TableContainer component={Paper} sx={{ width: "1300px" }}>
+          <TableContainer component={Paper} sx={{ width: "100%" }}>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>결제 ID</TableCell>
-                  <TableCell>impUid</TableCell>
+                  <TableCell>구매자 이름</TableCell>
+                  {/* <TableCell>impUid</TableCell> */}
+                  <TableCell>제품 이름</TableCell>
                   <TableCell>금액</TableCell>
                   <TableCell>결제 방법</TableCell>
-                  <TableCell>merchantUid</TableCell>
-                  <TableCell>제품 이름</TableCell>
-                  <TableCell>구매자 이름</TableCell>
-                  <TableCell>구매자 전화</TableCell>
-                  <TableCell>구매자 주소</TableCell>
-                  <TableCell>구매자 우편번호</TableCell>
+                  {/* <TableCell>merchantUid</TableCell> */}
+                  <TableCell>전화</TableCell>
+                  <TableCell>주소</TableCell>
+                  <TableCell>우편번호</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paymentsInfos.map((payment) => (
                   <TableRow key={payment.id}>
-                    <TableCell>{payment.id}</TableCell>
-                    <TableCell>{payment.impUid}</TableCell>
+                    <TableCell>{payment.id}</TableCell>{" "}
+                    <TableCell>{payment.buyerName}</TableCell>
+                    {/* <TableCell>{payment.impUid}</TableCell> */}{" "}
+                    <TableCell>{payment.name}</TableCell>
                     <TableCell>{payment.paid_amount}</TableCell>
                     <TableCell>{payment.payMethod}</TableCell>
-                    <TableCell>{payment.merchantUid}</TableCell>
-                    <TableCell>{payment.name}</TableCell>
-                    <TableCell>{payment.buyerName}</TableCell>
+                    {/* <TableCell>{payment.merchantUid}</TableCell> */}
                     <TableCell>{payment.buyerTel}</TableCell>
                     <TableCell>{payment.buyerAddr}</TableCell>
                     <TableCell>{payment.buyerPostcode}</TableCell>
