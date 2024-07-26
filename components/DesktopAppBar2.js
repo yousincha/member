@@ -12,6 +12,7 @@ import useLogout from "../hooks/useLogout2"; // Import useAuth
 
 const DesktopAppBar2 = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 추가
+  
   const {
     logoutDialogOpen,
     handleLogoutDialogOpen,
