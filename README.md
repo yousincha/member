@@ -28,7 +28,7 @@ React와 Next.js를 기반으로 하며, Material-UI 및 기타 최신 라이브
 먼저, 이 프로젝트의 리포지토리를 클론합니다:
 
 ```bash
-git clone https://github.com/username/my-project.git
+git clone https://github.com/username/member.git
 ```
 
 ### 디렉토리로 이동
