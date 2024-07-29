@@ -1,3 +1,5 @@
+![header](https://capsule-render.vercel.app/api?type=wave&color=FFABAB&height=300&section=header&text=YOUGOD❤️&fontSize=90&fontColor=FFFFFF&animation=fadeIn&stroke=2&strokeColor=FFFFFF)
+
 # 쇼핑몰 사용자 API
 
 이 프로젝트는 쇼핑몰 사용자와의 상호작용을 위한 클라이언트 측 API를 제공합니다. 
@@ -94,5 +96,14 @@ npm start
 ```bash
 npm run lint
 ```
+
+ 깃허브 통계 
+
+<div align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=yousincha&show_icons=true&theme=radical" alt="YOUGOD's GitHub stats" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=yousincha&layout=compact" alt="Top Langs" />
+</div>
+
+---
 
 
