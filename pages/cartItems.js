@@ -84,6 +84,7 @@ const CartItems = () => {
 
   const handleCancel = async (itemId) => {
     try {
+      // Pass itemId as an array
       const result = await cancelCart(loginInfo, [itemId]);
       setItemsInfo((prevItemsInfo) =>
         prevItemsInfo.filter((item) => item.id !== itemId)
@@ -92,7 +93,7 @@ const CartItems = () => {
         prevSelectedItems.filter((id) => id !== itemId)
       );
     } catch (error) {
-      alert(error);
+      alert(error.message);
     }
   };
 
