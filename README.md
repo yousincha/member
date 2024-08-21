@@ -99,8 +99,7 @@ npm run lint
 
  깃허브 통계 
 
-<div align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=yousincha&show_icons=true&theme=radical" alt="YOUGOD's GitHub stats" />
+<div align="left">
   <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=yousincha&layout=compact" alt="Top Langs" />
 </div>
 
